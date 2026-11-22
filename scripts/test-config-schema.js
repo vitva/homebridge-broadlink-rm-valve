@@ -50,6 +50,14 @@ assert.ok(accessoryProperties.data.condition);
 assert.ok(accessoryProperties.data.properties.open.condition);
 assert.ok(accessoryProperties.data.properties.close.condition);
 assert.ok(accessoryProperties.subType.condition);
+assert.equal(accessoryProperties.subType.default, 'stb');
+assert.ok(accessoryProperties.debug);
+assert.ok(accessoryProperties.resendHexAfterReload);
+assert.ok(accessoryProperties.valveType.condition);
+assert.ok(accessoryProperties.data.condition);
+assert.ok(accessoryProperties.data.properties.open.condition);
+assert.ok(accessoryProperties.data.properties.close.condition);
+assert.ok(accessoryProperties.subType.condition);
 assert.ok(accessoryProperties.debug);
 assert.ok(accessoryProperties.resendHexAfterReload);
 
