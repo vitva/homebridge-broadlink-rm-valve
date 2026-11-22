@@ -24,7 +24,6 @@ jobs:
           node-version: ${{ matrix.node_version }}
           cache: npm
       - name: Synchronize lockfile
-        if: matrix.node_version == 22
         run: npm install --package-lock-only --ignore-scripts
       - name: Preserve generated lockfile for review
         if: matrix.node_version == 22
