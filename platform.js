@@ -78,7 +78,7 @@ const BroadlinkRMPlatform = class extends HomebridgePlatform {
       const homeKitAccessory = new classTypes[accessory.type](log, accessory);
 
       if (classTypes[accessory.type] === classTypes.tv) {
-        const tvSubType = (accessory.subType || 'stb').toLowerCase();
+        const tvSubType = (accessory.subType || 'tv').toLowerCase();
         if (tvSubType === 'stb') {homeKitAccessory.subType = homebridgeRef.hap.Categories.TV_SET_TOP_BOX;}
         if (tvSubType === 'receiver') {homeKitAccessory.subType = homebridgeRef.hap.Categories.AUDIO_RECEIVER;}
         if (tvSubType === 'stick') {homeKitAccessory.subType = homebridgeRef.hap.Categories.TV_STREAMING_STICK;}
