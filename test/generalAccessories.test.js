@@ -27,7 +27,7 @@ describe('disableLogs', () => {
     const accessories = await getAccessories(config, log);
 
     const logFunctionAsString = accessories[0].log.toString();
-    const isEmptyFunction = logFunctionAsString === '() => {}';
+    const isEmptyFunction = logFunctionAsString.replace(/\s/g, '') === '()=>{}';
     
     expect(isEmptyFunction).to.equal(true);
   });
