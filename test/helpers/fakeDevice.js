@@ -12,6 +12,12 @@ class FakeDevice {
 
     this.callbacks = {};
 
+    // Fake transport keeps sends synchronous for deterministic legacy tests.
+    // Production devices still receive the real async mutex in getDevice().
+    this.mutex = {
+      use: (callback) => callback()
+    };
+
     this.isUnitTestDevice = true;
 
     this.resetSentHexCodes();
