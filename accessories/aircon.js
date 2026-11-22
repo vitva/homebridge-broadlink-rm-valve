@@ -230,7 +230,7 @@ class AirConAccessory extends BroadlinkRMAccessory {
     if (previousValue === Characteristic.TargetHeatingCoolingState.OFF) {this.previouslyOff = true;}
 
     // If the air-conditioner is turned off then turn it on first and try this again
-    if (this.checkTurnOnWhenOff()) {
+    if (await this.checkTurnOnWhenOff()) {
       this.turnOnWhenOffDelayPromise = delayForDuration(.3);
       await this.turnOnWhenOffDelayPromise
     }
