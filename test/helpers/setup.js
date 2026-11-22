@@ -10,17 +10,18 @@ const { addDevice } = require('../../helpers/getDevice');
 global.Service = hap.Service;
 global.Characteristic = hap.Characteristic;
 
-// The platform helper expects Homebridge's storage API. Supply an isolated
-// temporary storage directory so the legacy accessory tests exercise the
-// same initialization path as a real Homebridge installation.
-const testStoragePath = fs.mkdtempSync(path.join(os.tmpdir(), 'homebridge-broadlink-rm-test-'));
-const testHomebridge = {
-  hap,
-  user: {
-    storagePath: () => testStoragePath
-  }
+// The platform helper expects Homebridge's storage API. Give every test setup
+// its own temporary directory to prevent persisted accessory state leaking
+// between otherwise independent tests.
+const setTestHomebridge = () => {
+  const testStoragePath = fs.mkdtempSync(path.join(os.tmpdir(), 'homebridge-broadlink-rm-test-'));
+  BroadlinkRMPlatform.setHomebridge({
+    hap,
+    user: {
+      storagePath: () => testStoragePath
+    }
+  });
 };
-BroadlinkRMPlatform.setHomebridge(testHomebridge);
 
 const log = (message, more) => {
   if (more) {
@@ -31,6 +32,7 @@ const log = (message, more) => {
 };
 
 const setup = (config) => {
+  setTestHomebridge();
   const platform = new BroadlinkRMPlatform(log, config);
 
   const device = new FakeDevice();
