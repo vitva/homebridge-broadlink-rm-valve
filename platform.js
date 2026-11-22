@@ -111,6 +111,10 @@ const BroadlinkRMPlatform = class extends HomebridgePlatform {
     const { config, log, logLevel } = this;
     const { hosts } = config;
 
+    if (config.isUnitTest) {
+      return;
+    }
+
     if (!hosts || (Array.isArray(hosts) && hosts.length === 0)) {
       if (logLevel <=2) {log(`\x1b[35m[INFO]\x1b[0m Automatically discovering Broadlink RM devices.`)}
       discoverDevices(true, log, logLevel, config.deviceDiscoveryTimeout);
