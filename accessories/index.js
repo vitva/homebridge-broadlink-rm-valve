@@ -40,5 +40,6 @@ module.exports = {
   TV,
   TemperatureSensor,
   HumiditySensor,
-  HeaterCooler
+  HeaterCooler,
+  Valve
 }
