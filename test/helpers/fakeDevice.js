@@ -11,6 +11,9 @@ class FakeDevice {
     };
 
     this.callbacks = {};
+    this.mutex = {
+      use: async (callback) => callback()
+    };
 
     this.isUnitTestDevice = true;
 
