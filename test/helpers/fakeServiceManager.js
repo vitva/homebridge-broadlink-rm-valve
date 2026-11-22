@@ -3,10 +3,10 @@ const ServiceManager = require('../../helpers/serviceManager')
 
 class FakeServiceManager extends ServiceManager {
 
-  constructor (log, config, serviceType, serviceSubType) {
-    super(log, config, serviceType, serviceSubType)
+  constructor (name, serviceType, log) {
+    super(name, serviceType, log)
 
-    this.service = new FakeService(config.name, log);
+    this.service = new FakeService(name, log);
     this.hasRecordedSetCharacteristic = false
   }
 
