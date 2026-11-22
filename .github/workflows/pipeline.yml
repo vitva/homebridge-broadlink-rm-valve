@@ -8,7 +8,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: homebridge-broadlink-rm-valve-${{ github.ref }}
+  group: homebridge-broadlink-rm-valve-${{ github.ref }}-serial
   cancel-in-progress: true
 
 jobs:
@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         node_version:
           - 22
