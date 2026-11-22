@@ -356,26 +356,27 @@
               }
             },
             "subType": {
-              "title": "Подтип телевизора",
+              "title": "Категория телевизора HomeKit",
               "type": "string",
-              "default": "tv",
-              "description": "Выберите категорию аксессуара TV.",
+              "description": "Подкатегория внешнего телевизора. Если не задавать, сохраняется исходное поведение плагина.",
               "oneOf": [
                 {
-                  "title": "Обычный телевизор",
-                  "enum": ["tv"]
-                },
-                {
                   "title": "Приставка (STB)",
-                  "enum": ["stb"]
+                  "enum": [
+                    "stb"
+                  ]
                 },
                 {
                   "title": "Аудиоресивер",
-                  "enum": ["receiver"]
+                  "enum": [
+                    "receiver"
+                  ]
                 },
                 {
                   "title": "Стриминговая приставка",
-                  "enum": ["stick"]
+                  "enum": [
+                    "stick"
+                  ]
                 }
               ],
               "condition": {
