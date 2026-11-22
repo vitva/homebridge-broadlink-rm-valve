@@ -44,7 +44,7 @@ const getAccessories = (config, replacementLog) => {
 
   return new Promise((resolve, reject) => {
     try {
-      platform.accessories(resolve);
+      platform.accessories(resolve).catch(reject);
     } catch (error) {
       reject(error);
     }
