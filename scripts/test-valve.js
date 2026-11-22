@@ -8,6 +8,7 @@ const Module = require('module');
 const originalLoad = Module._load;
 const sentCommands = [];
 let shouldFailSend = false;
+let deviceAvailable = true;
 
 class FakeBroadlinkAccessory {
   constructor (log, config = {}, serviceManagerType = 'ServiceManager') {
@@ -86,13 +87,21 @@ const setActive = function (valve, value) {
   assert.strictEqual(valve.state.inUse, global.Characteristic.InUse.NOT_IN_USE);
 
   const previousState = Object.assign({}, valve.state);
+  deviceAvailable = false;
+  await assert.rejects(setActive(valve, global.Characteristic.Active.ACTIVE), /no ready Broadlink RM device is available/);
+  assert.deepStrictEqual(valve.state, previousState, 'missing Broadlink device must not update the virtual state');
+  deviceAvailable = true;
+
+  await assert.rejects(setActive(valve, 99), /invalid Active value/);
+  assert.deepStrictEqual(valve.state, previousState, 'invalid HomeKit state must not update the virtual state');
+
   shouldFailSend = true;
   await assert.rejects(setActive(valve, global.Characteristic.Active.ACTIVE), /Simulated Broadlink send failure/);
   shouldFailSend = false;
   assert.deepStrictEqual(valve.state, previousState, 'failed send must not update the virtual state');
 
   assert.throws(function () {
-    createValve({ open: 'OPEN_ONLY' });
+    createValve({ open: 'OPEN_ONLY', close: '' });
   }, /requires data\.open and data\.close commands/);
 
   console.log('PASS: default HomeKit ValveType is water faucet (3)');
@@ -100,6 +109,8 @@ const setActive = function (valve, value) {
   console.log('PASS: closing sends only the configured close command');
   console.log('PASS: failed transmission leaves the virtual state unchanged');
   console.log('PASS: incomplete valve configuration is rejected');
+  console.log('PASS: missing Broadlink device leaves the virtual state unchanged');
+  console.log('PASS: invalid HomeKit Active values are rejected');
   Module._load = originalLoad;
 })().catch(function (error) {
   Module._load = originalLoad;
