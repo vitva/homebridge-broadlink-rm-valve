@@ -359,7 +359,25 @@
               "title": "Подтип телевизора",
               "type": "string",
               "default": "tv",
-              "description": "Подтип сервиса телевизора. По умолчанию tv.",
+              "description": "Выберите категорию аксессуара TV.",
+              "oneOf": [
+                {
+                  "title": "Обычный телевизор",
+                  "enum": ["tv"]
+                },
+                {
+                  "title": "Приставка (STB)",
+                  "enum": ["stb"]
+                },
+                {
+                  "title": "Аудиоресивер",
+                  "enum": ["receiver"]
+                },
+                {
+                  "title": "Стриминговая приставка",
+                  "enum": ["stick"]
+                }
+              ],
               "condition": {
                 "functionBody": "return model.accessories?.[arrayIndices]?.type === 'tv';"
               }
