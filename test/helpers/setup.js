@@ -5,7 +5,8 @@ const path = require('path');
 
 const BroadlinkRMPlatform = require('../../platform');
 const FakeDevice = require('./fakeDevice');
-const { addDevice } = require('../../helpers/getDevice');
+const fakegatoHistory = require('fakegato-history');
+const { addDevice, resetDevices } = require('../../helpers/getDevice');
 
 global.Service = hap.Service;
 global.Characteristic = hap.Characteristic;
