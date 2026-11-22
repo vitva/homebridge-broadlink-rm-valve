@@ -1,0 +1,353 @@
+{
+  "pluginAlias": "BroadlinkRM",
+  "pluginType": "platform",
+  "singular": true,
+  "headerDisplay": "Настройка Broadlink RM для Homebridge. Добавляйте аксессуары в список ниже. Для обучения ИК-команд используйте аксессуар **Learn**, который плагин добавляет автоматически. [Инструкция и примеры](https://github.com/vitva/homebridge-broadlink-rm-valve#readme).",
+  "footerDisplay": "**Кран:** задайте две разные команды — `open` (открыть) и `close` (закрыть). Broadlink не подтверждает физическое положение крана: HomeKit показывает состояние последней успешно отправленной команды. Сложные последовательности и расширенные настройки доступны через JSON Config.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Название платформы",
+        "type": "string",
+        "default": "Broadlink RM",
+        "required": true
+      },
+      "logLevel": {
+        "title": "Уровень журнала",
+        "type": "string",
+        "default": "info",
+        "oneOf": [
+          {
+            "title": "Отключён",
+            "enum": [
+              "none"
+            ]
+          },
+          {
+            "title": "Критические",
+            "enum": [
+              "critical"
+            ]
+          },
+          {
+            "title": "Ошибки",
+            "enum": [
+              "error"
+            ]
+          },
+          {
+            "title": "Предупреждения",
+            "enum": [
+              "warning"
+            ]
+          },
+          {
+            "title": "Информация",
+            "enum": [
+              "info"
+            ]
+          },
+          {
+            "title": "Отладка",
+            "enum": [
+              "debug"
+            ]
+          },
+          {
+            "title": "Подробный",
+            "enum": [
+              "trace"
+            ]
+          }
+        ]
+      },
+      "deviceDiscoveryTimeout": {
+        "title": "Время поиска устройств (секунды)",
+        "type": "number",
+        "minimum": 1
+      },
+      "hideLearnButton": {
+        "title": "Скрыть аксессуар обучения команд",
+        "type": "boolean",
+        "default": false
+      },
+      "hideScanFrequencyButton": {
+        "title": "Скрыть сканирование радиочастоты",
+        "type": "boolean",
+        "default": false
+      },
+      "hideWelcomeMessage": {
+        "title": "Скрыть приветственное сообщение",
+        "type": "boolean",
+        "default": false
+      },
+      "hosts": {
+        "title": "Устройства Broadlink RM (ручное добавление)",
+        "type": "array",
+        "description": "Оставьте пустым для автоматического поиска. Если список заполнен, укажите IP и MAC каждого устройства.",
+        "items": {
+          "title": "Устройство Broadlink",
+          "type": "object",
+          "properties": {
+            "address": {
+              "title": "IP-адрес",
+              "type": "string",
+              "required": true,
+              "placeholder": "192.168.1.20"
+            },
+            "mac": {
+              "title": "MAC-адрес",
+              "type": "string",
+              "required": true,
+              "placeholder": "34:ea:34:12:34:56"
+            },
+            "isRM4": {
+              "title": "Модель RM4",
+              "type": "boolean",
+              "default": false
+            },
+            "isRFSupported": {
+              "title": "Поддержка RF",
+              "type": "boolean",
+              "default": false
+            }
+          }
+        }
+      },
+      "accessories": {
+        "title": "Аксессуары HomeKit",
+        "type": "array",
+        "description": "Добавьте аксессуар, выберите его тип и укажите команды Broadlink.",
+        "items": {
+          "title": "Аксессуар",
+          "type": "object",
+          "properties": {
+            "name": {
+              "title": "Имя аксессуара",
+              "type": "string",
+              "required": true
+            },
+            "type": {
+              "title": "Тип аксессуара",
+              "type": "string",
+              "required": true,
+              "oneOf": [
+                {
+                  "title": "Кран (Valve)",
+                  "enum": [
+                    "valve"
+                  ]
+                },
+                {
+                  "title": "Выключатель",
+                  "enum": [
+                    "switch"
+                  ]
+                },
+                {
+                  "title": "Мультивыключатель",
+                  "enum": [
+                    "switch-multi"
+                  ]
+                },
+                {
+                  "title": "Выключатель с повтором",
+                  "enum": [
+                    "switch-repeat"
+                  ]
+                },
+                {
+                  "title": "Мультивыключатель с повтором",
+                  "enum": [
+                    "switch-multi-repeat"
+                  ]
+                },
+                {
+                  "title": "Розетка",
+                  "enum": [
+                    "outlet"
+                  ]
+                },
+                {
+                  "title": "Свет",
+                  "enum": [
+                    "light"
+                  ]
+                },
+                {
+                  "title": "Вентилятор",
+                  "enum": [
+                    "fan"
+                  ]
+                },
+                {
+                  "title": "Вентилятор (старый)",
+                  "enum": [
+                    "fanv1"
+                  ]
+                },
+                {
+                  "title": "Кондиционер",
+                  "enum": [
+                    "air-conditioner"
+                  ]
+                },
+                {
+                  "title": "Очиститель воздуха",
+                  "enum": [
+                    "air-purifier"
+                  ]
+                },
+                {
+                  "title": "Увлажнитель/осушитель",
+                  "enum": [
+                    "humidifier-dehumidifier"
+                  ]
+                },
+                {
+                  "title": "Датчик температуры",
+                  "enum": [
+                    "temperatureSensor"
+                  ]
+                },
+                {
+                  "title": "Датчик влажности",
+                  "enum": [
+                    "humiditySensor"
+                  ]
+                },
+                {
+                  "title": "Дверь гаража",
+                  "enum": [
+                    "garage-door-opener"
+                  ]
+                },
+                {
+                  "title": "Замок",
+                  "enum": [
+                    "lock"
+                  ]
+                },
+                {
+                  "title": "Окно",
+                  "enum": [
+                    "window"
+                  ]
+                },
+                {
+                  "title": "Жалюзи",
+                  "enum": [
+                    "window-covering"
+                  ]
+                },
+                {
+                  "title": "Телевизор",
+                  "enum": [
+                    "tv"
+                  ]
+                },
+                {
+                  "title": "Обогреватель/охладитель",
+                  "enum": [
+                    "heater-cooler"
+                  ]
+                },
+                {
+                  "title": "Обучение ИК-командам",
+                  "enum": [
+                    "learn-ir"
+                  ]
+                },
+                {
+                  "title": "Обучение коду",
+                  "enum": [
+                    "learn-code"
+                  ]
+                }
+              ]
+            },
+            "host": {
+              "title": "IP-адрес или MAC Broadlink",
+              "type": "string",
+              "description": "Необязательно при автоматическом обнаружении устройства."
+            },
+            "disabled": {
+              "title": "Отключить аксессуар",
+              "type": "boolean",
+              "default": false
+            },
+            "valveType": {
+              "title": "Тип крана HomeKit",
+              "type": "integer",
+              "default": 3,
+              "minimum": 0,
+              "maximum": 3,
+              "description": "Для крана: 0 — общий, 1 — полив, 2 — душ, 3 — водопроводный кран."
+            },
+            "data": {
+              "title": "Команды Broadlink",
+              "type": "object",
+              "description": "Для крана заполните open и close. Для остальных аксессуаров используйте ключи команд из документации. Сложные последовательности можно задать через JSON Config.",
+              "properties": {
+                "open": {
+                  "title": "Открыть (HEX)",
+                  "type": "string",
+                  "description": "Отдельная выученная команда открытия."
+                },
+                "close": {
+                  "title": "Закрыть (HEX)",
+                  "type": "string",
+                  "description": "Отдельная выученная команда закрытия."
+                },
+                "on": {
+                  "title": "Включить (HEX)",
+                  "type": "string"
+                },
+                "off": {
+                  "title": "Выключить (HEX)",
+                  "type": "string"
+                },
+                "stop": {
+                  "title": "Стоп (HEX)",
+                  "type": "string"
+                }
+              },
+              "additionalProperties": true
+            }
+          }
+        }
+      }
+    }
+  },
+  "form": [
+    {
+      "key": "name"
+    },
+    {
+      "type": "fieldset",
+      "title": "Обнаружение Broadlink",
+      "items": [
+        "deviceDiscoveryTimeout",
+        "hosts"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Аксессуары HomeKit",
+      "items": [
+        "accessories"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Общие параметры",
+      "items": [
+        "logLevel",
+        "hideLearnButton",
+        "hideScanFrequencyButton",
+        "hideWelcomeMessage"
+      ]
+    }
+  ]
+}
