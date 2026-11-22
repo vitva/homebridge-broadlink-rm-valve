@@ -3,7 +3,7 @@
   "pluginType": "platform",
   "singular": true,
   "headerDisplay": "Настройка Broadlink RM для Homebridge. Добавляйте аксессуары в список ниже. Для обучения ИК-команд используйте аксессуар **Learn**, который плагин добавляет автоматически. [Инструкция и примеры](https://github.com/vitva/homebridge-broadlink-rm-valve#readme).",
-  "footerDisplay": "**Кран:** укажите две независимые HEX-команды — открыть и закрыть. Поля команд меняются в зависимости от выбранного типа аксессуара. Broadlink не подтверждает физическое положение крана: HomeKit отображает последнюю успешно отправленную команду. Сложные последовательности, повторы и паузы доступны в JSON Config.",
+  "footerDisplay": "**Кран:** укажите две независимые HEX-команды — открыть и закрыть. Для гаражных ворот и жалюзи также доступны отдельные команды открытия/закрытия; для замков — блокировки/разблокировки. Broadlink не подтверждает физическое положение исполнительного устройства: HomeKit отображает состояние по последней успешно отправленной команде. Сложные последовательности, повторы и паузы доступны в JSON Config.",
   "schema": {
     "type": "object",
     "properties": {
@@ -285,7 +285,7 @@
               "maximum": 3,
               "description": "Для крана: 0 — общий, 1 — полив, 2 — душ, 3 — водопроводный кран.",
               "condition": {
-                "functionBody": "return ['valve', 'garage-door-opener', 'window-covering'].includes(model.accessories?.[arrayIndices]?.type);"
+                "functionBody": "return model.accessories?.[arrayIndices]?.type === 'valve';"
               }
             },
             "data": {
@@ -298,7 +298,7 @@
                   "type": "string",
                   "description": "HEX-код отдельной команды открытия. Не используйте toggle-команду.",
                   "condition": {
-                    "functionBody": "return model.accessories?.[arrayIndices]?.type === 'valve';"
+                    "functionBody": "const type = model.accessories?.[arrayIndices]?.type; return ['valve', 'garage-door-opener', 'window-covering'].includes(type);"
                   }
                 },
                 "close": {
@@ -306,22 +306,24 @@
                   "type": "string",
                   "description": "HEX-код отдельной команды закрытия. Не используйте toggle-команду.",
                   "condition": {
-                    "functionBody": "return model.accessories?.[arrayIndices]?.type === 'valve';"
+                    "functionBody": "const type = model.accessories?.[arrayIndices]?.type; return ['valve', 'garage-door-opener', 'window-covering'].includes(type);"
                   }
                 },
                 "on": {
                   "title": "Включить (HEX)",
                   "type": "string",
                   "condition": {
-                    "functionBody": "const type = model.accessories?.[arrayIndices]?.type; return type !== 'valve' && type !== 'garage-door-opener' && type !== 'window-covering';"
-                  }
+                    "functionBody": "const type = model.accessories?.[arrayIndices]?.type; return !['valve', 'garage-door-opener', 'window-covering', 'lock'].includes(type);"
+                  },
+                  "description": "Команда включения. Для сложных типов аксессуаров используйте соответствующие поля ниже."
                 },
                 "off": {
                   "title": "Выключить (HEX)",
                   "type": "string",
                   "condition": {
-                    "functionBody": "return model.accessories?.[arrayIndices]?.type !== 'valve';"
-                  }
+                    "functionBody": "const type = model.accessories?.[arrayIndices]?.type; return !['valve', 'garage-door-opener', 'window-covering', 'lock'].includes(type);"
+                  },
+                  "description": "Команда выключения."
                 },
                 "stop": {
                   "title": "Стоп (HEX)",
@@ -329,6 +331,22 @@
                   "description": "Команда остановки для жалюзи.",
                   "condition": {
                     "functionBody": "return model.accessories?.[arrayIndices]?.type === 'window-covering';"
+                  }
+                },
+                "lock": {
+                  "title": "Заблокировать (HEX)",
+                  "type": "string",
+                  "description": "Команда блокировки для замка или гаражных ворот.",
+                  "condition": {
+                    "functionBody": "return ['lock', 'garage-door-opener'].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "unlock": {
+                  "title": "Разблокировать (HEX)",
+                  "type": "string",
+                  "description": "Команда разблокировки для замка или гаражных ворот.",
+                  "condition": {
+                    "functionBody": "return ['lock', 'garage-door-opener'].includes(model.accessories?.[arrayIndices]?.type);"
                   }
                 }
               },
@@ -340,32 +358,11 @@
             "subType": {
               "title": "Подтип телевизора",
               "type": "string",
-              "description": "Используется только для аксессуара TV.",
-              "oneOf": [
-                {
-                  "title": "Приставка (STB)",
-                  "enum": [
-                    "stb"
-                  ]
-                },
-                {
-                  "title": "Аудиоресивер",
-                  "enum": [
-                    "receiver"
-                  ]
-                },
-                {
-                  "title": "Стриминговая приставка",
-                  "enum": [
-                    "stick"
-                  ]
-                }
-              ],
+              "default": "tv",
+              "description": "Подтип сервиса телевизора. По умолчанию tv.",
               "condition": {
                 "functionBody": "return model.accessories?.[arrayIndices]?.type === 'tv';"
-              },
-              "default": "stb",
-              "required": true
+              }
             },
             "debug": {
               "title": "Режим отладки",
