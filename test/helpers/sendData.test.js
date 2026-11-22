@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 
 const { setup } = require('./setup');
-const { sendData } = require('../../helpers/sendData');
+const sendData = require('../../helpers/sendData');
 const { getDevice } = require('../../helpers/getDevice');
 
 describe('test device wiring', () => {
