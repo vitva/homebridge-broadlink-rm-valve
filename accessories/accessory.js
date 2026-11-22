@@ -84,7 +84,7 @@ class BroadlinkRMAccessory extends HomebridgeAccessory {
     if(data === undefined){return}
 
     if (typeof data === 'string') {
-      sendData({ host, hexData: data, log, name, logLevel });
+      await sendData({ host, hexData: data, log, name, logLevel });
 
       return;
     }
@@ -114,7 +114,7 @@ class BroadlinkRMAccessory extends HomebridgeAccessory {
 
     // Itterate through each hex config in the array
     for (let index = 0; data && index < sendCount; index++) {
-      sendData({ host, hexData: data, log, name, logLevel });
+      await sendData({ host, hexData: data, log, name, logLevel });
 
       if (interval && index < sendCount - 1) {
         this.intervalTimeoutPromise = delayForDuration(interval);
