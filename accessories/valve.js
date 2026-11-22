@@ -8,6 +8,7 @@ const ServiceManagerTypes = require('../helpers/serviceManagerTypes');
  * command successfully handed to the Broadlink send routine.
  */
 class ValveAccessory extends BroadlinkRMAccessory {
+
   setupServiceManager () {
     const { data, name, serviceManagerType, config } = this;
     const { open, close } = data || {};
@@ -17,21 +18,30 @@ class ValveAccessory extends BroadlinkRMAccessory {
     }
 
     this.serviceManager = new ServiceManagerTypes[serviceManagerType](name, Service.Valve, this.log);
-    const valveType = (config.valveType === undefined) ? 3 : config.valveType;
+
+    const valveType = (config.valveType === undefined)
+      ? 3
+      : config.valveType;
     this.serviceManager.setCharacteristic(Characteristic.ValveType, valveType);
 
     this.serviceManager.addGetCharacteristic({
-      name: 'active', type: Characteristic.Active,
-      method: this.getCharacteristicValue, bind: this,
+      name: 'active',
+      type: Characteristic.Active,
+      method: this.getCharacteristicValue,
+      bind: this,
       props: { propertyName: 'active' }
     });
     this.serviceManager.addSetCharacteristic({
-      name: 'active', type: Characteristic.Active,
-      method: this.setActive, bind: this
+      name: 'active',
+      type: Characteristic.Active,
+      method: this.setActive,
+      bind: this
     });
     this.serviceManager.addGetCharacteristic({
-      name: 'inUse', type: Characteristic.InUse,
-      method: this.getCharacteristicValue, bind: this,
+      name: 'inUse',
+      type: Characteristic.InUse,
+      method: this.getCharacteristicValue,
+      bind: this,
       props: { propertyName: 'inUse' }
     });
   }
@@ -39,6 +49,7 @@ class ValveAccessory extends BroadlinkRMAccessory {
   async setActive (value, callback) {
     const isActive = value === Characteristic.Active.ACTIVE;
     const command = isActive ? this.data.open : this.data.close;
+
     try {
       await this.performSend(command);
       this.state.active = isActive ? Characteristic.Active.ACTIVE : Characteristic.Active.INACTIVE;
@@ -50,4 +61,5 @@ class ValveAccessory extends BroadlinkRMAccessory {
     }
   }
 }
+
 module.exports = ValveAccessory;
