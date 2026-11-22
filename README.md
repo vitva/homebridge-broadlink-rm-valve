@@ -16,6 +16,16 @@ npm install -g https://github.com/vitva/homebridge-broadlink-rm-valve.git
 
 Requires Node.js 22.12 or newer (22, 24, or 26) and Homebridge 2.x.
 
+## Homebridge visual settings
+
+The plugin includes a native Homebridge Config UI form. After installation, open **Plugins → Homebridge Broadlink RM Pro + Valve → Settings** to configure the platform, discover or manually enter RM devices, and add accessories without editing the main JSON configuration.
+
+For a valve, choose **Кран (Valve)** and enter two separate learned commands in **Команды Broadlink**:
+- **Открыть (HEX)** — command that opens the valve
+- **Закрыть (HEX)** — command that closes the valve
+
+The built-in form exposes common settings and the valve fields. Advanced accessory types and multi-step command sequences remain available in Homebridge's JSON Config editor so existing configurations are not restricted by the simplified form.
+
 ## Water valve configuration
 
 Use separate learned Broadlink codes for opening and closing. The accessory does not use a toggle command.
