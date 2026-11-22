@@ -95,6 +95,7 @@ class AirConAccessory extends BroadlinkRMAccessory {
     // Used to determine when we should use the defaultHeatTemperature or the
     // defaultHeatTemperature
     config.heatTemperature = config.heatTemperature || 22;
+    if (config.replaceAutoMode === undefined) {config.replaceAutoMode = 'cool';}
 
     // Set state default values
     // state.targetTemperature = state.targetTemperature || config.minTemperature;
