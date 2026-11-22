@@ -105,7 +105,7 @@ const setActive = function (valve, value) {
 
   assert.throws(function () {
     createValve({ open: 'OPEN_ONLY', close: '' });
-  }, /requires valid data\\.open and data\\.close commands/);
+  }, /requires valid data\.open and data\.close commands/);
 
   console.log('PASS: default HomeKit ValveType is water faucet (3)');
   console.log('PASS: opening sends only the configured open command');
