@@ -32,7 +32,9 @@ Use separate learned Broadlink codes for opening and closing. The accessory does
 }
 ```
 
-Both `data.open` and `data.close` are required. Learn each command separately with the existing Broadlink learning accessory, then put the resulting hex codes in the configuration.
+Both `data.open` and `data.close` are required. Each command may be a single learned hex string or an array of command steps (the same repeat/pause format supported by the existing accessories). Learn each command separately with the existing Broadlink learning accessory, then put the resulting code or command sequence in the configuration.
+
+The optional `valveType` accepts HomeKit values `0` (generic), `1` (irrigation), `2` (shower), or `3` (water faucet, the default).
 
 HomeKit reports the last successfully sent command. Broadlink RM devices do not provide physical valve-position feedback, so the displayed state cannot confirm that the valve physically moved.
 
@@ -41,7 +43,7 @@ HomeKit reports the last successfully sent command. Broadlink RM devices do not 
 ```sh
 npm ci
 npm run lint
-npm run test:valve
+npm test
 ```
 
 ## Source and license
