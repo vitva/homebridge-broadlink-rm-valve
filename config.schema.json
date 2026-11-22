@@ -3,7 +3,7 @@
   "pluginType": "platform",
   "singular": true,
   "headerDisplay": "Настройка Broadlink RM для Homebridge. Добавляйте аксессуары в список ниже. Для обучения ИК-команд используйте аксессуар **Learn**, который плагин добавляет автоматически. [Инструкция и примеры](https://github.com/vitva/homebridge-broadlink-rm-valve#readme).",
-  "footerDisplay": "**Кран:** задайте две разные команды — `open` (открыть) и `close` (закрыть). Broadlink не подтверждает физическое положение крана: HomeKit показывает состояние последней успешно отправленной команды. Сложные последовательности и расширенные настройки доступны через JSON Config.",
+  "footerDisplay": "**Кран:** укажите две независимые HEX-команды — открыть и закрыть. Поля команд меняются в зависимости от выбранного типа аксессуара. Broadlink не подтверждает физическое положение крана: HomeKit отображает последнюю успешно отправленную команду. Сложные последовательности, повторы и паузы доступны в JSON Config.",
   "schema": {
     "type": "object",
     "properties": {
@@ -283,7 +283,10 @@
               "default": 3,
               "minimum": 0,
               "maximum": 3,
-              "description": "Для крана: 0 — общий, 1 — полив, 2 — душ, 3 — водопроводный кран."
+              "description": "Для крана: 0 — общий, 1 — полив, 2 — душ, 3 — водопроводный кран.",
+              "condition": {
+                "functionBody": "return model.accessories?.[arrayIndices]?.type === 'valve';"
+              }
             },
             "data": {
               "title": "Команды Broadlink",
@@ -293,27 +296,83 @@
                 "open": {
                   "title": "Открыть (HEX)",
                   "type": "string",
-                  "description": "Отдельная выученная команда открытия."
+                  "description": "HEX-код отдельной команды открытия. Не используйте toggle-команду.",
+                  "condition": {
+                    "functionBody": "return model.accessories?.[arrayIndices]?.type === 'valve';"
+                  }
                 },
                 "close": {
                   "title": "Закрыть (HEX)",
                   "type": "string",
-                  "description": "Отдельная выученная команда закрытия."
+                  "description": "HEX-код отдельной команды закрытия. Не используйте toggle-команду.",
+                  "condition": {
+                    "functionBody": "return model.accessories?.[arrayIndices]?.type === 'valve';"
+                  }
                 },
                 "on": {
                   "title": "Включить (HEX)",
-                  "type": "string"
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return model.accessories?.[arrayIndices]?.type !== 'valve';"
+                  }
                 },
                 "off": {
                   "title": "Выключить (HEX)",
-                  "type": "string"
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return model.accessories?.[arrayIndices]?.type !== 'valve';"
+                  }
                 },
                 "stop": {
                   "title": "Стоп (HEX)",
-                  "type": "string"
+                  "type": "string",
+                  "description": "Необязательная отдельная команда остановки, если поддерживается аксессуаром."
                 }
               },
-              "additionalProperties": true
+              "additionalProperties": true,
+              "condition": {
+                "functionBody": "return !!model.accessories?.[arrayIndices]?.type;"
+              }
+            },
+            "subType": {
+              "title": "Подтип телевизора",
+              "type": "string",
+              "description": "Используется только для аксессуара TV.",
+              "oneOf": [
+                {
+                  "title": "Приставка (STB)",
+                  "enum": [
+                    "stb"
+                  ]
+                },
+                {
+                  "title": "Аудиоресивер",
+                  "enum": [
+                    "receiver"
+                  ]
+                },
+                {
+                  "title": "Стриминговая приставка",
+                  "enum": [
+                    "stick"
+                  ]
+                }
+              ],
+              "condition": {
+                "functionBody": "return model.accessories?.[arrayIndices]?.type === 'tv';"
+              }
+            },
+            "debug": {
+              "title": "Режим отладки",
+              "type": "boolean",
+              "default": false,
+              "description": "Включает подробные сообщения для этого аксессуара."
+            },
+            "resendHexAfterReload": {
+              "title": "Повторить последнюю команду после перезапуска",
+              "type": "boolean",
+              "default": false,
+              "description": "Для совместимости с исходным плагином. Используйте осторожно для исполнительных устройств."
             }
           }
         }
