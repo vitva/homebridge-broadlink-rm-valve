@@ -1,11 +1,15 @@
 name: Build
-"on":
-  - push
+
+on:
+  push:
+  pull_request:
+
 jobs:
   build:
     name: "Build and Test on Node ${{ matrix.node_version }} and ${{ matrix.os }}"
-    runs-on: "${{ matrix.os }}"
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         node_version:
           - 22
@@ -16,12 +20,15 @@ jobs:
           - macOS-latest
           - windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
       - name: "Use Node.js ${{ matrix.node_version }}"
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
-          node-version: "${{ matrix.node_version }}"
-      - name: npm build and test
-        run: |
-          npm ci
-          npm run lint
+          node-version: ${{ matrix.node_version }}
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Run test suite
+        run: npm test
