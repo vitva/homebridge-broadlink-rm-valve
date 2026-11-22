@@ -21,8 +21,24 @@ const HeaterCooler = require('./heater-cooler');
 const Valve = require('./valve');
 
 module.exports = {
-  AirCon, AirPurifier, HumidifierDehumidifier, LearnCode, Switch, SwitchMulti,
-  SwitchMultiRepeat, Outlet, SwitchRepeat, Fan, Fanv1, GarageDoorOpener, Lock,
-  Light, Window, WindowCovering, TV, TemperatureSensor, HumiditySensor,
-  HeaterCooler, Valve
+  AirCon,
+  AirPurifier,
+  HumidifierDehumidifier,
+  LearnCode,
+  Switch,
+  SwitchMulti,
+  SwitchMultiRepeat,
+  Outlet,
+  SwitchRepeat,
+  Fan,
+  Fanv1,
+  GarageDoorOpener,
+  Lock,
+  Light,
+  Window,
+  WindowCovering,
+  TV,
+  TemperatureSensor,
+  HumiditySensor,
+  HeaterCooler
 }
