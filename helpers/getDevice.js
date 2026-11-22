@@ -107,7 +107,10 @@ const resetDevices = () => {
 const addDevice = (device) => {
   if (!device.isUnitTestDevice && (discoveredDevices[device.host.address] || discoveredDevices[device.host.macAddress])) {return;}
 
-  device.mutex = new Mutex();
+  // Preserve a test double's synchronous mutex; production devices receive a real mutex.
+  if (!device.mutex) {
+    device.mutex = new Mutex();
+  }
 
   discoveredDevices[device.host.address] = device;
   discoveredDevices[device.host.macAddress] = device;
