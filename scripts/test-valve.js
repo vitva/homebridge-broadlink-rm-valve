@@ -52,6 +52,9 @@ Module._load = function (request, parent, isMain) {
   if (request === '../helpers/serviceManagerTypes' && parent && /accessories[\\/]valve\.js$/.test(parent.filename)) {
     return { ServiceManager: FakeServiceManager, FakeServiceManager: FakeServiceManager };
   }
+  if (request === '../helpers/getDevice' && parent && /accessories[\\/]valve\.js$/.test(parent.filename)) {
+    return { getDevice: () => deviceAvailable ? { sendData: function () {} } : undefined };
+  }
   return originalLoad.call(this, request, parent, isMain);
 };
 
