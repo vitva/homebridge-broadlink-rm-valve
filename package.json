@@ -18,7 +18,8 @@
     "rm mini 3",
     "rm4",
     "valve",
-    "water-valve"
+    "water-valve",
+    "supports-hap"
   ],
   "engines": {
     "node": "^22.12.0 || ^24.0.0 || ^26.0.0",
