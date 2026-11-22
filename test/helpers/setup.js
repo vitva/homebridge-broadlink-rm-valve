@@ -33,7 +33,8 @@ const log = (message, more) => {
 
 const setup = (config) => {
   setTestHomebridge();
-  const platform = new BroadlinkRMPlatform(log, config);
+  const platformConfig = Object.assign({ hosts: [] }, config);
+  const platform = new BroadlinkRMPlatform(log, platformConfig);
 
   const device = new FakeDevice();
   addDevice(device);
