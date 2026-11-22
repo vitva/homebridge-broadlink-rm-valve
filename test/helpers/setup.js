@@ -11,17 +11,19 @@ const { addDevice, resetDevices } = require('../../helpers/getDevice');
 global.Service = hap.Service;
 global.Characteristic = hap.Characteristic;
 
-// The platform helper expects Homebridge's storage API. Give every test setup
-// its own temporary directory to prevent persisted accessory state leaking
-// between otherwise independent tests.
+// Give each test isolated Homebridge storage and initialize the same
+// fakegato HistoryService global that the plugin initializer provides.
 const setTestHomebridge = () => {
   const testStoragePath = fs.mkdtempSync(path.join(os.tmpdir(), 'homebridge-broadlink-rm-test-'));
-  BroadlinkRMPlatform.setHomebridge({
+  const homebridge = {
     hap,
     user: {
       storagePath: () => testStoragePath
     }
-  });
+  };
+
+  global.HistoryService = fakegatoHistory(homebridge);
+  BroadlinkRMPlatform.setHomebridge(homebridge);
 };
 
 const log = (message, more) => {
@@ -33,6 +35,7 @@ const log = (message, more) => {
 };
 
 const setup = (config) => {
+  resetDevices();
   setTestHomebridge();
   const platformConfig = Object.assign({ isUnitTest: true }, config);
   const platform = new BroadlinkRMPlatform(log, platformConfig);
