@@ -360,7 +360,9 @@
               ],
               "condition": {
                 "functionBody": "return model.accessories?.[arrayIndices]?.type === 'tv';"
-              }
+              },
+              "default": "stb",
+              "required": true
             },
             "debug": {
               "title": "Режим отладки",
