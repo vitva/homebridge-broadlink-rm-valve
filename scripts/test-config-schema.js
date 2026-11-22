@@ -63,7 +63,7 @@ assert.ok(openCondition.includes('window-covering'));
 const stopCondition = accessoryProperties.data.properties.stop.condition.functionBody;
 assert.ok(stopCondition.includes('window-covering'));
 assert.ok(accessoryProperties.subType.condition);
-assert.equal(accessoryProperties.subType.default, 'tv');
+assert.deepEqual(accessoryProperties.subType.oneOf.map(option => option.enum[0]), ['stb', 'receiver', 'stick']);
 assert.ok(accessoryProperties.debug);
 assert.ok(accessoryProperties.resendHexAfterReload);
 assert.ok(accessoryProperties.valveType.condition);
