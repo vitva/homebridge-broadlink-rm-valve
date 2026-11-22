@@ -16,9 +16,31 @@ assert.ok(platformProperties.hosts);
 
 const accessoryProperties = platformProperties.accessories.items.properties;
 const supportedTypes = accessoryProperties.type.oneOf.map(option => option.enum[0]);
-assert.ok(supportedTypes.includes('valve'));
-assert.ok(supportedTypes.includes('switch'));
-assert.ok(supportedTypes.includes('learn-ir'));
+const expectedTypes = [
+  'air-conditioner',
+  'air-purifier',
+  'humidifier-dehumidifier',
+  'learn-ir',
+  'learn-code',
+  'switch',
+  'garage-door-opener',
+  'lock',
+  'switch-multi',
+  'switch-multi-repeat',
+  'switch-repeat',
+  'fan',
+  'fanv1',
+  'outlet',
+  'light',
+  'window',
+  'window-covering',
+  'tv',
+  'temperatureSensor',
+  'humiditySensor',
+  'heater-cooler',
+  'valve'
+];
+expectedTypes.forEach(type => assert.ok(supportedTypes.includes(type), `Missing UI accessory type: ${type}`));
 
 assert.ok(accessoryProperties.data.properties.open);
 assert.ok(accessoryProperties.data.properties.close);
