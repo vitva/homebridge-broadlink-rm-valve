@@ -69,7 +69,7 @@ describe('windowCoveringAccessory', () => {
     const totalDurationClose = 8;
 
     const openDurationPerPercent = windowCoveringAccessory.determineOpenCloseDurationPerPercent({
-      opening: true,
+      positionState: Characteristic.PositionState.INCREASING,
       totalDurationOpen,
       totalDurationClose
     });
@@ -77,7 +77,7 @@ describe('windowCoveringAccessory', () => {
     expect(openDurationPerPercent).to.equal(totalDurationOpen / 100);
 
     const closeDurationPerPercent = windowCoveringAccessory.determineOpenCloseDurationPerPercent({
-      opening: false,
+      positionState: Characteristic.PositionState.DECREASING,
       totalDurationOpen,
       totalDurationClose
     });
@@ -100,7 +100,7 @@ describe('windowCoveringAccessory', () => {
     const windowCoveringAccessory = new WindowCovering(null, config, 'FakeServiceManager')
 
     const durationPerPercent = windowCoveringAccessory.determineOpenCloseDurationPerPercent({
-      opening: true,
+      positionState: Characteristic.PositionState.INCREASING,
       totalDurationOpen: config.totalDurationOpen,
       totalDurationClose: config.totalDurationClose 
     });
@@ -142,7 +142,7 @@ describe('windowCoveringAccessory', () => {
     const windowCoveringAccessory = new WindowCovering(null, config, 'FakeServiceManager')
 
     const durationPerPercent = windowCoveringAccessory.determineOpenCloseDurationPerPercent({
-      opening: true,
+      positionState: Characteristic.PositionState.INCREASING,
       totalDurationOpen: config.totalDurationOpen,
       totalDurationClose: config.totalDurationClose 
     });
@@ -196,13 +196,13 @@ describe('windowCoveringAccessory', () => {
     const windowCoveringAccessory = new WindowCovering(null, config, 'FakeServiceManager');
 
     const openDurationPerPercent = windowCoveringAccessory.determineOpenCloseDurationPerPercent({
-      opening: true,
+      positionState: Characteristic.PositionState.INCREASING,
       totalDurationOpen: config.totalDurationOpen,
       totalDurationClose: config.totalDurationClose 
     });
 
     const closeDurationPerPercent = windowCoveringAccessory.determineOpenCloseDurationPerPercent({
-      opening: false,
+      positionState: Characteristic.PositionState.DECREASING,
       totalDurationOpen: config.totalDurationOpen,
       totalDurationClose: config.totalDurationClose 
     });
@@ -256,7 +256,7 @@ describe('windowCoveringAccessory', () => {
     const windowCoveringAccessory = new WindowCovering(null, config, 'FakeServiceManager')
   
     const durationPerPercent = windowCoveringAccessory.determineOpenCloseDurationPerPercent({
-      opening: true,
+      positionState: Characteristic.PositionState.INCREASING,
       totalDurationOpen: config.totalDurationOpen,
       totalDurationClose: config.totalDurationClose 
     });
@@ -292,7 +292,7 @@ describe('windowCoveringAccessory', () => {
     const windowCoveringAccessory = new WindowCovering(null, config, 'FakeServiceManager')
 
     const durationPerPercent = windowCoveringAccessory.determineOpenCloseDurationPerPercent({
-      opening: true,
+      positionState: Characteristic.PositionState.INCREASING,
       totalDurationOpen: config.totalDurationOpen,
       totalDurationClose: config.totalDurationClose 
     });
@@ -333,7 +333,7 @@ describe('windowCoveringAccessory', () => {
     const windowCoveringAccessory = new WindowCovering(null, config, 'FakeServiceManager')
 
     const durationPerPercent = windowCoveringAccessory.determineOpenCloseDurationPerPercent({
-      opening: true,
+      positionState: Characteristic.PositionState.INCREASING,
       totalDurationOpen: config.totalDurationOpen,
       totalDurationClose: config.totalDurationClose
     });
