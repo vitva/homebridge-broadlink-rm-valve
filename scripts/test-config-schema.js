@@ -23,5 +23,12 @@ assert.ok(supportedTypes.includes('learn-ir'));
 assert.ok(accessoryProperties.data.properties.open);
 assert.ok(accessoryProperties.data.properties.close);
 assert.ok(accessoryProperties.valveType);
+assert.ok(accessoryProperties.valveType.condition);
+assert.ok(accessoryProperties.data.condition);
+assert.ok(accessoryProperties.data.properties.open.condition);
+assert.ok(accessoryProperties.data.properties.close.condition);
+assert.ok(accessoryProperties.subType.condition);
+assert.ok(accessoryProperties.debug);
+assert.ok(accessoryProperties.resendHexAfterReload);
 
 console.log('PASS: Homebridge Config UI schema is valid and includes valve open/close settings');
