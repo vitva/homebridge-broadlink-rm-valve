@@ -62,6 +62,7 @@ class FakeCharacteristic {
   }
 
   set (value) {
+    this.value = value;
     this.log('Set Fake Value Received')
 
     return this.setMethod(value, (err, value) => {
