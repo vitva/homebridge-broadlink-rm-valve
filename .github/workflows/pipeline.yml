@@ -4,6 +4,9 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: write
+
 concurrency:
   group: homebridge-broadlink-rm-valve-${{ github.ref }}
   cancel-in-progress: true
@@ -26,6 +29,19 @@ jobs:
         with:
           node-version: ${{ matrix.node_version }}
           cache: npm
+      - name: Refresh safe transitive dependencies
+        if: matrix.node_version == 22
+        run: |
+          npm audit fix --package-lock-only || true
+          if ! git diff --quiet -- package.json package-lock.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            branch="security/dependency-fix-${GITHUB_RUN_ID}"
+            git checkout -b "$branch"
+            git add package.json package-lock.json
+            git commit -m "fix: update vulnerable transitive dependencies"
+            git push origin "$branch"
+          fi
       - name: Install dependencies
         run: npm ci
       - name: Audit production dependencies
