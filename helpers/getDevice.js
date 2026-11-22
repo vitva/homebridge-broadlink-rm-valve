@@ -98,6 +98,12 @@ const discoverDevices = (automatic = true, log, logLevel, deviceDiscoveryTimeout
   })
 }
 
+// Clear device registries between isolated unit tests. Production discovery is unchanged.
+const resetDevices = () => {
+  Object.keys(discoveredDevices).forEach((host) => delete discoveredDevices[host]);
+  Object.keys(manualDevices).forEach((host) => delete manualDevices[host]);
+};
+
 const addDevice = (device) => {
   if (!device.isUnitTestDevice && (discoveredDevices[device.host.address] || discoveredDevices[device.host.macAddress])) {return;}
 
@@ -152,4 +158,4 @@ const getDevice = ({ host, log, learnOnly }) => {
   return device;
 }
 
-module.exports = { getDevice, discoverDevices, addDevice };
+module.exports = { getDevice, discoverDevices, addDevice, resetDevices };
