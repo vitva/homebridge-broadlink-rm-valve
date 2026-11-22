@@ -285,13 +285,13 @@
               "maximum": 3,
               "description": "Для крана: 0 — общий, 1 — полив, 2 — душ, 3 — водопроводный кран.",
               "condition": {
-                "functionBody": "return model.accessories?.[arrayIndices]?.type === 'valve';"
+                "functionBody": "return ['valve', 'garage-door-opener', 'window-covering'].includes(model.accessories?.[arrayIndices]?.type);"
               }
             },
             "data": {
               "title": "Команды Broadlink",
               "type": "object",
-              "description": "Для крана заполните open и close. Для остальных аксессуаров используйте ключи команд из документации. Сложные последовательности можно задать через JSON Config.",
+              "description": "Для крана, гаражных ворот и жалюзи используйте open и close. Для остальных типов — on и off. Сложные последовательности можно задать через JSON Config.",
               "properties": {
                 "open": {
                   "title": "Открыть (HEX)",
@@ -313,7 +313,7 @@
                   "title": "Включить (HEX)",
                   "type": "string",
                   "condition": {
-                    "functionBody": "return model.accessories?.[arrayIndices]?.type !== 'valve';"
+                    "functionBody": "const type = model.accessories?.[arrayIndices]?.type; return type !== 'valve' && type !== 'garage-door-opener' && type !== 'window-covering';"
                   }
                 },
                 "off": {
@@ -326,7 +326,10 @@
                 "stop": {
                   "title": "Стоп (HEX)",
                   "type": "string",
-                  "description": "Необязательная отдельная команда остановки, если поддерживается аксессуаром."
+                  "description": "Команда остановки для жалюзи.",
+                  "condition": {
+                    "functionBody": "return model.accessories?.[arrayIndices]?.type === 'window-covering';"
+                  }
                 }
               },
               "additionalProperties": true,
