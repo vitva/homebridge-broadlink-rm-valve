@@ -53,6 +53,12 @@ class FakeCharacteristic {
     this.log = log
     this.type = type
     this.serviceName = serviceName
+    this.value = undefined;
+  }
+
+  updateValue (value) {
+    this.value = value;
+    return this;
   }
 
   get () {
