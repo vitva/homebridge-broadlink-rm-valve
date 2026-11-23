@@ -177,7 +177,7 @@ class AirConAccessory extends BroadlinkRMAccessory {
     return (!this.autoSwitchAccessory || (this.autoSwitchAccessory && this.autoSwitchAccessory.state && this.autoSwitchAccessory.state.switchState));
   }
 
-  setTargetTemperature (previousValue) {
+  async setTargetTemperature (hexData, previousValue) {
     const { config, log, logLevel, name, serviceManager, state } = this;
     const { preventResendHex, minTemperature, maxTemperature } = config;
 
@@ -192,8 +192,15 @@ class AirConAccessory extends BroadlinkRMAccessory {
     // this temperature rather than one automatically set.
     state.userSpecifiedTargetTemperature = state.targetTemperature;
 
+    // If the thermostat is off and configured to turn on for a temperature
+    // change, send the ON command first and allow the device to wake up.
+    if (await this.checkTurnOnWhenOff()) {
+      this.turnOnWhenOffDelayPromise = delayForDuration(0.3);
+      await this.turnOnWhenOffDelayPromise;
+    }
+
     // Do the actual sending of the temperature
-    this.sendTemperature(state.targetTemperature, previousValue);
+    await this.sendTemperature(state.targetTemperature, previousValue);
     serviceManager.updateCharacteristic(Characteristic.TargetTemperature, state.targetTemperature);
   }
 
