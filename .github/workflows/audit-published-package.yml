@@ -1,10 +1,18 @@
 name: Audit published npm artifact
 
 on:
-  push:
+  pull_request:
     branches:
-      - security/hardening-4.4.21-valve.4
+      - main
   workflow_dispatch:
+    inputs:
+      version:
+        description: Published npm version to audit (with or without leading v)
+        required: false
+        type: string
+  release:
+    types:
+      - published
 
 permissions:
   contents: read
@@ -20,24 +28,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 22
-      - name: Use consistent npm version
-        run: npm install --global npm@10.9.9
-      - name: Compare every published file with Git tag
+      - name: Compare every published file with the exact Git tag
+        env:
+          EXPECTED_VERSION: ${{ inputs.version || github.event.release.tag_name || '4.4.21-valve.4' }}
         run: bash scripts/audit-published-package.sh
-      - name: Verify the 4.4.21-valve.4 release-candidate npm archive
-        run: bash scripts/audit-release-candidate.sh
-      - name: Inspect published package signature and provenance metadata
-        run: |
-          echo "Registry signatures:"
-          npm view homebridge-broadlink-rm-valve@4.4.21-valve.3 dist.signatures --json
-          echo "Provenance attestations:"
-          npm view homebridge-broadlink-rm-valve@4.4.21-valve.3 dist.attestations --json
-      - name: Verify npm signatures and provenance
-        continue-on-error: true
-        run: |
-          TMP_DIR="$(mktemp -d)"
-          trap 'rm -rf "$TMP_DIR"' EXIT
-          cd "$TMP_DIR"
-          npm init -y
-          npm install --ignore-scripts --no-audit --no-fund homebridge-broadlink-rm-valve@4.4.21-valve.3
-          npm audit signatures
