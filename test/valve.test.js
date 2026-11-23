@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 
-const { setup } = require('./helpers/setup');
+const { setup, log } = require('./helpers/setup');
 const Valve = require('../accessories/valve');
 
 const setActive = (valve, value) => new Promise((resolve, reject) => {
