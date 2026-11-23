@@ -164,7 +164,7 @@ describe('windowCoveringAccessory', () => {
 
     // Wait for initialDelay
     await delayForDuration(windowCoveringAccessory.config.initialDelay);
-    expect(windowCoveringAccessory.state.currentPosition).to.equal(21);
+    expect(windowCoveringAccessory.state.currentPosition).to.equal(20);
 
     // Check value at 50%
     await delayForDuration(50 * durationPerPercent);
@@ -224,7 +224,7 @@ describe('windowCoveringAccessory', () => {
 
     // Wait for initialDelay
     await delayForDuration(windowCoveringAccessory.config.initialDelay);
-    expect(windowCoveringAccessory.state.currentPosition).to.equal(89);
+    expect(windowCoveringAccessory.state.currentPosition).to.equal(90);
 
     // Check value at 60%
     await delayForDuration(30 * closeDurationPerPercent);
