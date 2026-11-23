@@ -2,15 +2,23 @@
 set -euo pipefail
 
 PACKAGE="homebridge-broadlink-rm-valve"
-VERSION="4.4.21-valve.3"
-TAG="v4.4.21-valve.3"
+RAW_VERSION="${EXPECTED_VERSION:-$(node -p "require('./package.json').version")}"
+VERSION="${RAW_VERSION#v}"
+TAG="${EXPECTED_TAG:-v${VERSION}}"
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
-echo "Downloading exact published npm artifact: ${PACKAGE}@${VERSION}"
-npm pack "${PACKAGE}@${VERSION}" --json --pack-destination "$TMP_DIR" > "$TMP_DIR/pack.json"
+if [ -z "$VERSION" ] || [ "$TAG" != "v$VERSION" ]; then
+  echo "::error::Version/tag mismatch: version=$VERSION tag=$TAG"
+  exit 1
+fi
 
-TARBALL="$(node -e 'const p=require(process.argv[1]); process.stdout.write(p[0].filename)' "$TMP_DIR/pack.json")"
+echo "Auditing exact published npm artifact: ${PACKAGE}@${VERSION}"
+echo "Comparing against Git tag: ${TAG}"
+
+npm pack "${PACKAGE}@${VERSION}" --json --pack-destination "$TMP_DIR" > "$TMP_DIR/pack.json"
+TARBALL="$(node -e 'const p=require(process.argv[1]); if (!p[0]?.filename) process.exit(2); process.stdout.write(p[0].filename)' "$TMP_DIR/pack.json")"
+
 mkdir "$TMP_DIR/unpacked"
 tar -xzf "$TMP_DIR/$TARBALL" -C "$TMP_DIR/unpacked"
 
@@ -30,4 +38,4 @@ while IFS= read -r path; do
   COUNT=$((COUNT + 1))
 done < <(node -e 'const p=require(process.argv[1]); for (const f of p[0].files) console.log(f.path)' "$TMP_DIR/pack.json")
 
-echo "PASS: all $COUNT files in the published npm tarball exactly match Git tag $TAG."
+echo "PASS: all $COUNT published files exactly match Git tag $TAG."
