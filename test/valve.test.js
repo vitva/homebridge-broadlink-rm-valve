@@ -38,4 +38,28 @@ describe('valveAccessory', () => {
     expect(valve.state.active).to.equal(Characteristic.Active.INACTIVE);
     expect(valve.state.inUse).to.equal(Characteristic.InUse.NOT_IN_USE);
   });
+  it('serializes concurrent multi-step open and close actions', async () => {
+    const { device } = setup();
+    const valve = new Valve(null, {
+      name: 'Queued water valve',
+      host: device.host.address,
+      persistState: false,
+      data: {
+        open: [
+          { data: 'AABB' },
+          { data: 'CCDD' }
+        ],
+        close: 'DDEE'
+      }
+    }, 'FakeServiceManager');
+
+    await Promise.all([
+      setActive(valve, Characteristic.Active.ACTIVE),
+      setActive(valve, Characteristic.Active.INACTIVE)
+    ]);
+
+    expect(device.sentHexCodes).to.deep.equal(['AABB', 'CCDD', 'DDEE']);
+    expect(valve.state.active).to.equal(Characteristic.Active.INACTIVE);
+  });
+
 });
