@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.4.21-valve.3] - 2026-11-23
+
+### Added
+- Added a HomeKit Valve accessory with separate Broadlink commands for opening and closing.
+- Added native Homebridge Config UI fields for valve type and open/close commands.
+- Added an ESM entry point while retaining the CommonJS entry point.
+
+### Changed
+- Declared compatibility with Homebridge 2 and Node.js 22, 24, and 26.
+- Clarified that HomeKit displays the last command dispatched to Broadlink; it cannot confirm the valve's physical position.
+- Expanded automated checks for valve behavior, configuration schema, and module exports.
+
+### Validation
+- GitHub Actions passed on Node.js 22, 24, and 26, including dependency installation, Homebridge 2 HAP test runtime setup, lint, and the full test suite.
+- Production dependency audit passed on Node.js 22.
+
 ## [4.4.21 - 2026-05-10]
 ### Fixed
  - Homebridge 2.0 compatibility: access HAP categories via `hap.Categories` instead of `hap.Accessory.Categories`. (#777 thanks @Gernot)
