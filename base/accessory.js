@@ -57,7 +57,7 @@ class HomebridgeAccessory {
 
   checkConfig(config) {
     const { name, log, logLevel } = this;
-    if (typeof config !== 'object') {return;}
+    if (!config || typeof config !== 'object') {return;}
 
     Object.keys(config).forEach((key) => {
       const value = config[key];
@@ -65,7 +65,7 @@ class HomebridgeAccessory {
       if (value === 'true' || value === 'false') {
         log(`\x1b[31m[CONFIG ERROR]\x1b[0m ${name}Boolean values should look like this: \x1b[32m"${key}": ${value}\x1b[0m not this \x1b[31m"${key}": "${value}"\x1b[0m`);
 
-        process.exit(0);
+        throw new Error(`Invalid configuration: "${key}" must be a boolean value, not a string.`);
       } else if (Array.isArray(value)) {
         value.forEach((item) => {
           this.checkConfig(item);
@@ -79,7 +79,7 @@ class HomebridgeAccessory {
 
         log(`\x1b[31m[CONFIG ERROR]\x1b[0m ${name}Numeric values should look like this: \x1b[32m"${key}": ${value}\x1b[0m not this \x1b[31m"${key}": "${value}"\x1b[0m`);
 
-        process.exit(0);
+        throw new Error(`Invalid configuration: "${key}" must be a number, not a numeric string.`);
       }
     })
   }
