@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "lint-fix": "eslint --fix .",
     "test:valve": "node scripts/test-valve.js",
-    "test": "mocha --recursive test --exit && npm run test:valve && node scripts/test-config-schema.js"
+    "test": "mocha --recursive test --exit && npm run test:valve && node scripts/test-config-schema.js && npm run test:exports",
+    "test:exports": "node scripts/test-module-exports.mjs"
   },
   "keywords": [
     "homebridge-plugin",
