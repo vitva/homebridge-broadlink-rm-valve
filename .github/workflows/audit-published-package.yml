@@ -24,6 +24,8 @@ jobs:
         run: npm install --global npm@10.9.9
       - name: Compare every published file with Git tag
         run: bash scripts/audit-published-package.sh
+      - name: Verify the 4.4.21-valve.4 release-candidate npm archive
+        run: bash scripts/audit-release-candidate.sh
       - name: Inspect published package signature and provenance metadata
         run: |
           echo "Registry signatures:"
