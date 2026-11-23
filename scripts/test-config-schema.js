@@ -64,7 +64,7 @@ const stopCondition = accessoryProperties.data.properties.stop.condition.functio
 assert.ok(stopCondition.includes('window-covering'));
 assert.ok(accessoryProperties.subType.condition);
 assert.deepEqual(accessoryProperties.subType.oneOf.map(option => option.enum[0]), ['stb', 'receiver', 'stick']);
-assert.ok(accessoryProperties.debug);
+assert.ok(accessoryProperties.mqttAllowInsecureTLS);\nassert.equal(accessoryProperties.mqttAllowInsecureTLS.type, 'boolean');\nassert.equal(accessoryProperties.mqttAllowInsecureTLS.default, false);\nassert.ok(accessoryProperties.debug);
 assert.ok(accessoryProperties.resendHexAfterReload);
 assert.ok(accessoryProperties.valveType.condition);
 assert.ok(accessoryProperties.data.condition);
