@@ -362,6 +362,7 @@ describe('airConAccessory', async () => {
 
     const airConAccessory = new AirCon(null, config, 'FakeServiceManager');
 
+    airConAccessory.getCurrentTemperature(() => {});
     device.sendFakeOnCallback('temperature', 17)
 
     await delayForDuration(0.3);
@@ -375,6 +376,7 @@ describe('airConAccessory', async () => {
 
     airConAccessory.updateTemperatureUI();
     
+    airConAccessory.getCurrentTemperature(() => {});
     device.sendFakeOnCallback('temperature', 23)
     
     await delayForDuration(0.3);
@@ -387,6 +389,7 @@ describe('airConAccessory', async () => {
     // Try forcing auto-on/off again with a normal temperature
     airConAccessory.updateTemperatureUI();
 
+    airConAccessory.getCurrentTemperature(() => {});
     device.sendFakeOnCallback('temperature', 23)
 
     await delayForDuration(0.3);
@@ -409,6 +412,7 @@ describe('airConAccessory', async () => {
 
     const airConAccessory = new AirCon(null, config, 'FakeServiceManager');
 
+    airConAccessory.getCurrentTemperature(() => {});
     device.sendFakeOnCallback('temperature', 28)
 
     await delayForDuration(0.3);
@@ -422,6 +426,7 @@ describe('airConAccessory', async () => {
 
     airConAccessory.updateTemperatureUI();
     
+    airConAccessory.getCurrentTemperature(() => {});
     device.sendFakeOnCallback('temperature', 26)
     
     await delayForDuration(0.3);
@@ -434,6 +439,7 @@ describe('airConAccessory', async () => {
     // Try forcing auto-on/off again with a normal temperature
     airConAccessory.updateTemperatureUI();
 
+    airConAccessory.getCurrentTemperature(() => {});
     device.sendFakeOnCallback('temperature', 26)
 
     await delayForDuration(0.3);
