@@ -346,9 +346,11 @@ class AirConAccessory extends BroadlinkRMAccessory {
     const { defaultHeatTemperature, defaultCoolTemperature, heatTemperature } = config;
 
     let finalTemperature = temperature;
+    // A temperature change is still meaningful while the thermostat is off.
+    // Select the appropriate heat/cool temperature code instead of returning
+    // the OFF command (which has no .data payload).
     if (mode === 'off') {
-      const hexData = data.off;
-      return { finalTemperature, hexData };
+      mode = (temperature >= heatTemperature) ? 'heat' : 'cool';
     } 
     let hexData = data[`${mode}${temperature}`];
 
