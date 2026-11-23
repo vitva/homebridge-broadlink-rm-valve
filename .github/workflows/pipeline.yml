@@ -36,8 +36,8 @@ jobs:
       - name: Report full dependency audit
         if: matrix.node_version == 22
         run: |
-          npm audit --json > npm-audit.json || true
-          node -e 'const a=require("./npm-audit.json"); console.log("Full audit totals:", JSON.stringify(a.metadata?.vulnerabilities)); for (const [name,v] of Object.entries(a.vulnerabilities || {})) console.log(JSON.stringify({name,severity:v.severity,isDirect:v.isDirect,via:v.via.map(x=>typeof x === "string" ? x : {name:x.name,title:x.title,range:x.range,url:x.url}),effects:v.effects,range:v.range,fixAvailable:v.fixAvailable}));'
+          npm audit --json > "$RUNNER_TEMP/npm-audit.json" || true
+          node -e 'const a=require(process.env.RUNNER_TEMP + "/npm-audit.json"); console.log("Full audit totals:", JSON.stringify(a.metadata?.vulnerabilities)); for (const [name,v] of Object.entries(a.vulnerabilities || {})) console.log(JSON.stringify({name,severity:v.severity,isDirect:v.isDirect,via:v.via.map(x=>typeof x === "string" ? x : {name:x.name,title:x.title,range:x.range,url:x.url}),effects:v.effects,range:v.range,fixAvailable:v.fixAvailable}));'
       - name: Audit production dependencies
         if: matrix.node_version == 22
         run: npm audit --omit=dev --audit-level=high
@@ -45,3 +45,6 @@ jobs:
         run: npm run lint
       - name: Run test suite
         run: npm test
+      - name: Audit release-candidate npm archive
+        if: matrix.node_version == 22
+        run: bash scripts/audit-release-candidate.sh

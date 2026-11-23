@@ -1,4 +1,14 @@
 # Changelog
+## [4.4.21-valve.5] - 2026-11-23
+
+### Fixed
+- Avoid terminating Homebridge when accessory configuration contains invalid boolean or numeric values; report configuration errors safely.
+- Validate each MQTT topic entry independently and ignore malformed entries such as null values without throwing.
+
+### Validation
+- Post-merge GitHub Actions passed on Node.js 22, 24, and 26.
+- Release-candidate archive, package metadata, dependency audits, and full test suite are pending validation.
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
