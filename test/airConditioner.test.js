@@ -311,8 +311,9 @@ describe('airConAccessory', async () => {
     // Check hex codes were sent
     hexCheck({ device, codes: [ 'TEMPERATURE_26' ], count: 1 });
 
-    // Set temperature to be above heatTemperature
-    airConAccessory.serviceManager.setCharacteristic(Characteristic.TargetTemperature, 26);
+    // Explicitly repeat the same target. This verifies allowResend at the
+    // accessory command layer without relying on HomeKit duplicate-write behavior.
+    await airConAccessory.setTargetTemperature(undefined, 26);
 
     await delayForDuration(0.3);
 
