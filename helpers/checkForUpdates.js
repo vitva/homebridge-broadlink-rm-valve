@@ -15,7 +15,6 @@ const checkForUpdates = (log) => {
     if (error) {
       return;
     }
-
     if (update) {
       log(`\x1b[32m[UPDATE AVAILABLE] \x1b[0mVersion ${update.name} of Homebridge Broadlink RM Pro + Valve is available. The release notes can be found here: \x1b[4mhttps://github.com/${options.owner}/${options.repo}/releases/\x1b[0m`);
     }

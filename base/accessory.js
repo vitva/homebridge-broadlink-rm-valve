@@ -279,16 +279,13 @@ class HomebridgeAccessory {
     if (Array.isArray(mqttTopic)) {
       const validTopics = mqttTopic.filter((mqttTopicObj) => {
         if (!mqttTopicObj || typeof mqttTopicObj !== 'object' || Array.isArray(mqttTopicObj)) {return false;}
-
         const { identifier, topic } = mqttTopicObj;
         return typeof identifier === 'string' && identifier.trim().length > 0 &&
           typeof topic === 'string' && topic.trim().length > 0;
       });
-
       if (validTopics.length !== mqttTopic.length && this.logLevel <= 4) {
         log(`\x1b[33m[CONFIG WARNING]\x1b[0m ${name} ignored ${mqttTopic.length - validTopics.length} invalid MQTT topic entr(y/ies).`);
       }
-
       mqttTopic = validTopics;
       if (mqttTopic.length === 0) {return;}
     }

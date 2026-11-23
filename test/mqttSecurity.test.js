@@ -81,15 +81,7 @@ describe('MQTT TLS certificate verification', () => {
   });
 
   it('keeps valid MQTT topics when an array also contains malformed entries', () => {
-    connectWithConfig({
-      mqttTopic: [
-        { identifier: 'temperature', topic: 'home/temperature' },
-        null,
-        { identifier: 'humidity', topic: '' },
-        { identifier: 'status', topic: 'home/status' }
-      ]
-    });
-
+    connectWithConfig({ mqttTopic: [{ identifier: 'temperature', topic: 'home/temperature' }, null, { identifier: 'humidity', topic: '' }, { identifier: 'status', topic: 'home/status' }] });
     expect(captured).to.not.equal(null);
     captured.client.emit('connect');
     expect(captured.client.subscribed).to.deep.equal(['home/temperature', 'home/status']);
