@@ -1,7 +1,7 @@
 {
   "name": "homebridge-broadlink-rm-valve",
   "displayName": "Homebridge Broadlink RM Pro + Valve",
-  "version": "4.4.21-valve.5",
+  "version": "4.4.21-valve.6",
   "description": "Broadlink RM plugin for Homebridge, with an additional water valve accessory.",
   "license": "Apache-2.0",
   "scripts": {
