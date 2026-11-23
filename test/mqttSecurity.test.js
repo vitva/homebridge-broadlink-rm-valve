@@ -20,8 +20,11 @@ describe('MQTT TLS certificate verification', () => {
     // module export before loading the accessory instead of assigning to it.
     require.cache[mqttModulePath].exports = {
       connect: (url, options) => {
-        captured = { url, options };
-        return new EventEmitter();
+        const client = new EventEmitter();
+        client.subscribed = [];
+        client.subscribe = (topic) => client.subscribed.push(topic);
+        captured = { url, options, client };
+        return client;
       }
     };
 
@@ -75,5 +78,20 @@ describe('MQTT TLS certificate verification', () => {
   it('ignores malformed MQTT topic array entries without throwing', () => {
     connectWithConfig({ mqttTopic: [null] });
     expect(captured).to.equal(null);
+  });
+
+  it('keeps valid MQTT topics when an array also contains malformed entries', () => {
+    connectWithConfig({
+      mqttTopic: [
+        { identifier: 'temperature', topic: 'home/temperature' },
+        null,
+        { identifier: 'humidity', topic: '' },
+        { identifier: 'status', topic: 'home/status' }
+      ]
+    });
+
+    expect(captured).to.not.equal(null);
+    captured.client.emit('connect');
+    expect(captured.client.subscribed).to.deep.equal(['home/temperature', 'home/status']);
   });
 });
