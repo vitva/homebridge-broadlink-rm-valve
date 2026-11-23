@@ -144,8 +144,8 @@ class LightAccessory extends SwitchAccessory {
           state.switchState = true;
         }
 
-        await this.checkAutoOnOff();
-
+        // A duplicate brightness update can arrive during state restoration.
+        // Do not reset timers here: that would cancel the first brightness send.
         return;
       }
 
