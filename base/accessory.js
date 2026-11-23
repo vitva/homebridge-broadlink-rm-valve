@@ -277,21 +277,17 @@ class HomebridgeAccessory {
     }
 
     if (Array.isArray(mqttTopic)) {
-      const erroneousTopics = mqttTopic.filter((mqttTopicObj) => {
-        if (!mqttTopicObj || typeof mqttTopicObj !== 'object' || Array.isArray(mqttTopicObj)) {return true;}
-
+      const validTopics = mqttTopic.filter((mqttTopicObj) => {
+        if (!mqttTopicObj || typeof mqttTopicObj !== 'object' || Array.isArray(mqttTopicObj)) {return false;}
         const { identifier, topic } = mqttTopicObj;
-
-        if (!identifier || !topic) {return true;}
-        if (typeof identifier !== 'string') {return true;}
-        if (typeof topic !== 'string') {return true;}
+        return typeof identifier === 'string' && identifier.trim().length > 0 &&
+          typeof topic === 'string' && topic.trim().length > 0;
       });
-
-      if (erroneousTopics.length > 0) {
-        if (this.logLevel <= 4) {log(`\x1b[31m[CONFIG ERROR]\x1b[0m ${name} \x1b[33mmqttTopic\x1b[0m value is incorrect. Please check out the documentation for more details.`)}
-
-        return;
+      if (validTopics.length !== mqttTopic.length && this.logLevel <= 4) {
+        log(`\x1b[33m[CONFIG WARNING]\x1b[0m ${name} ignored ${mqttTopic.length - validTopics.length} invalid MQTT topic entr(y/ies).`);
       }
+      mqttTopic = validTopics;
+      if (mqttTopic.length === 0) {return;}
     }
 
     // mqqtTopic may be an array or an array of objects. Add to a new array if string.

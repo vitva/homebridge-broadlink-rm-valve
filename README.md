@@ -4,11 +4,19 @@ A Homebridge Broadlink RM plugin fork with an additional HomeKit water-valve acc
 
 ## Install
 
-In Homebridge Config UI, open **Plugins → Install custom plugin** and enter:
+The recommended installation is from npm:
+
+```sh
+npm install -g homebridge-broadlink-rm-valve
+```
+
+You can also install it in Homebridge Config UI by opening **Plugins → Install Plugin** and searching for `homebridge-broadlink-rm-valve`.
+
+For a direct GitHub installation, use **Plugins → Install custom plugin** and enter:
 
 `https://github.com/vitva/homebridge-broadlink-rm-valve.git`
 
-Or install from the Homebridge server terminal:
+Or from the Homebridge server terminal:
 
 ```sh
 npm install -g https://github.com/vitva/homebridge-broadlink-rm-valve.git

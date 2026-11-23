@@ -7,7 +7,8 @@
 
 ### Validation
 - Post-merge GitHub Actions passed on Node.js 22, 24, and 26.
-- Release-candidate archive, package metadata, dependency audits, and full test suite are pending validation.
+- The full test suite passed (143 tests), and full and production npm audits reported zero vulnerabilities.
+- All 89 files in the published npm archive matched the Git release tag.
 
 All notable changes to this project will be documented in this file.
 
