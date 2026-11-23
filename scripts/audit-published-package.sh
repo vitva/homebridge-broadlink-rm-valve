@@ -16,8 +16,39 @@ fi
 echo "Auditing exact published npm artifact: ${PACKAGE}@${VERSION}"
 echo "Comparing against Git tag: ${TAG}"
 
-npm pack "${PACKAGE}@${VERSION}" --json --pack-destination "$TMP_DIR" > "$TMP_DIR/pack.json"
-TARBALL="$(node -e 'const p=require(process.argv[1]); if (!p[0]?.filename) process.exit(2); process.stdout.write(p[0].filename)' "$TMP_DIR/pack.json")"
+# npm accepts a publish before the version's metadata and tarball are fully
+# propagated. Poll the exact version instead of failing the release audit on
+# the first transient 404.
+MAX_ATTEMPTS=120
+RETRY_SECONDS=15
+TARBALL=""
+for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
+  rm -f "$TMP_DIR/pack.json" "$TMP_DIR/pack-error.log"
+  if npm pack "${PACKAGE}@${VERSION}" --json --pack-destination "$TMP_DIR" \
+    > "$TMP_DIR/pack.json" 2> "$TMP_DIR/pack-error.log"; then
+    TARBALL="$(node -e 'const p=require(process.argv[1]); if (!p[0]?.filename) process.exit(2); process.stdout.write(p[0].filename)' "$TMP_DIR/pack.json")"
+    echo "npm tarball is available (attempt $attempt/$MAX_ATTEMPTS)."
+    break
+  fi
+
+  if grep -Eq 'E404|ETARGET|404 Not Found|not in this registry' "$TMP_DIR/pack-error.log"; then
+    if [ "$attempt" -eq "$MAX_ATTEMPTS" ]; then
+      echo "::error::npm version/tarball was still unavailable after $((MAX_ATTEMPTS * RETRY_SECONDS / 60)) minutes."
+      cat "$TMP_DIR/pack-error.log"
+      exit 1
+    fi
+    echo "npm version/tarball is not visible yet (attempt $attempt/$MAX_ATTEMPTS); retrying in ${RETRY_SECONDS}s."
+    sleep "$RETRY_SECONDS"
+  else
+    cat "$TMP_DIR/pack-error.log"
+    exit 1
+  fi
+done
+
+if [ -z "$TARBALL" ]; then
+  echo "::error::npm pack did not produce a tarball."
+  exit 1
+fi
 
 mkdir "$TMP_DIR/unpacked"
 tar -xzf "$TMP_DIR/$TARBALL" -C "$TMP_DIR/unpacked"
