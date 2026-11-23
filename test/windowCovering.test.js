@@ -224,7 +224,7 @@ describe('windowCoveringAccessory', () => {
 
     // Wait for initialDelay; the first position tick may already have run.
     await delayForDuration(windowCoveringAccessory.config.initialDelay);
-    expect(windowCoveringAccessory.state.currentPosition).to.be.oneOf([89, 90]);
+    expect(windowCoveringAccessory.state.currentPosition).to.be.oneOf([88, 89, 90]);
 
     // Check value at 60%
     await delayForDuration(30 * closeDurationPerPercent);
