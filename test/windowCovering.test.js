@@ -162,9 +162,9 @@ describe('windowCoveringAccessory', () => {
     // Set blinds to 50%
     windowCoveringAccessory.serviceManager.setCharacteristic(Characteristic.TargetPosition, 50);
 
-    // Wait for initialDelay
+    // Wait for initialDelay; the first position tick may already have run.
     await delayForDuration(windowCoveringAccessory.config.initialDelay);
-    expect(windowCoveringAccessory.state.currentPosition).to.equal(20);
+    expect(windowCoveringAccessory.state.currentPosition).to.be.oneOf([20, 21]);
 
     // Check value at 50%
     await delayForDuration(50 * durationPerPercent);
@@ -222,9 +222,9 @@ describe('windowCoveringAccessory', () => {
     // Set blinds to 60%
     windowCoveringAccessory.serviceManager.setCharacteristic(Characteristic.TargetPosition, 60);
 
-    // Wait for initialDelay
+    // Wait for initialDelay; the first position tick may already have run.
     await delayForDuration(windowCoveringAccessory.config.initialDelay);
-    expect(windowCoveringAccessory.state.currentPosition).to.equal(90);
+    expect(windowCoveringAccessory.state.currentPosition).to.be.oneOf([89, 90]);
 
     // Check value at 60%
     await delayForDuration(30 * closeDurationPerPercent);
