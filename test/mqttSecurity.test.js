@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 const { expect } = require('chai');
 const { EventEmitter } = require('node:events');
 const mqtt = require('mqtt');
