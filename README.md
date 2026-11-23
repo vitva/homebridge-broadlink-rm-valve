@@ -46,7 +46,7 @@ Both `data.open` and `data.close` are required. Each command may be a single lea
 
 The optional `valveType` accepts HomeKit values `0` (generic), `1` (irrigation), `2` (shower), or `3` (water faucet, the default).
 
-HomeKit reports the last successfully sent command. Broadlink RM devices do not provide physical valve-position feedback, so the displayed state cannot confirm that the valve physically moved.
+HomeKit reports the last command dispatched to the Broadlink device. Broadlink RM devices do not provide physical valve-position feedback, so the displayed state cannot confirm that the valve physically moved.
 
 ## Tests
 
