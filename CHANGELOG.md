@@ -1,4 +1,19 @@
 # Changelog
+## [4.4.21-valve.6] - 2026-11-23
+
+### Fixed
+- Correct update notifications to link to this fork and detect valve prereleases.
+- Keep valid MQTT topic entries active when other entries in the configured list are invalid; warn about skipped entries.
+
+### Changed
+- Documented npm, Homebridge UI, and direct GitHub installation methods.
+
+### Validation
+- Post-merge GitHub Actions passed on Node.js 22, 24, and 26.
+- All 147 automated tests passed; ESLint passed.
+- Full and production npm audits reported zero vulnerabilities.
+
+
 ## [4.4.21-valve.5] - 2026-11-23
 
 ### Fixed
