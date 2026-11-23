@@ -30,6 +30,8 @@ jobs:
         run: npm install --global npm@10.9.9
       - name: Install dependencies
         run: npm ci
+      - name: Install Homebridge 2 HAP test runtime
+        run: npm install --no-save --package-lock=false @homebridge/hap-nodejs@2.3.0
       - name: Audit production dependencies
         if: matrix.node_version == 22
         run: npm audit --omit=dev --audit-level=high
