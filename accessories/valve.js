@@ -22,6 +22,8 @@ class ValveAccessory extends BroadlinkRMAccessory {
 
   setupServiceManager () {
     const { data, name, serviceManagerType, config } = this;
+    // Keep multi-step open/close sequences atomic relative to other valve actions.
+    this.commandQueue = Promise.resolve();
     const { open, close } = data || {};
 
     if (!isValidCommand(open) || !isValidCommand(close)) {
@@ -69,16 +71,23 @@ class ValveAccessory extends BroadlinkRMAccessory {
     const isActive = value === Characteristic.Active.ACTIVE;
     const command = isActive ? this.data.open : this.data.close;
 
-    try {
+    const operation = this.commandQueue.then(async () => {
       const device = getDevice({ host: this.host, log: this.log });
       if (!device || typeof device.sendData !== 'function') {
-        throw new Error(`Valve "${this.name}" cannot send the command: no ready Broadlink RM device is available.`);
+        throw new Error(\`Valve "\${this.name}" cannot send the command: no ready Broadlink RM device is available.\`);
       }
 
       await this.performSend(command);
       this.state.active = isActive ? Characteristic.Active.ACTIVE : Characteristic.Active.INACTIVE;
       this.state.inUse = isActive ? Characteristic.InUse.IN_USE : Characteristic.InUse.NOT_IN_USE;
       this.serviceManager.updateCharacteristic(Characteristic.InUse, this.state.inUse);
+    });
+
+    // Keep the queue usable after a failed command; report the failure only to this caller.
+    this.commandQueue = operation.catch(() => {});
+
+    try {
+      await operation;
       callback(null);
     } catch (error) {
       callback(error);
