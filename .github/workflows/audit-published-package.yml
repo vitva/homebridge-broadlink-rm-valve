@@ -1,0 +1,35 @@
+name: Audit published npm artifact
+
+on:
+  push:
+    branches:
+      - security/hardening-4.4.21-valve.4
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare-published-tarball:
+    name: Compare npm tarball with published Git tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - name: Use consistent npm version
+        run: npm install --global npm@10.9.9
+      - name: Compare every published file with Git tag
+        run: bash scripts/audit-published-package.sh
+      - name: Verify npm signatures and provenance
+        continue-on-error: true
+        run: |
+          TMP_DIR="$(mktemp -d)"
+          trap 'rm -rf "$TMP_DIR"' EXIT
+          cd "$TMP_DIR"
+          npm init -y
+          npm install --ignore-scripts --no-audit --no-fund homebridge-broadlink-rm-valve@4.4.21-valve.3
+          npm audit signatures
