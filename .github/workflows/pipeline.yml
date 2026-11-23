@@ -45,3 +45,6 @@ jobs:
         run: npm run lint
       - name: Run test suite
         run: npm test
+      - name: Audit release-candidate npm archive
+        if: matrix.node_version == 22
+        run: bash scripts/audit-release-candidate.sh
