@@ -32,7 +32,7 @@ jobs:
           fi
       - uses: actions/checkout@v5
         with:
-          ref: ${{ steps.release.outputs.tag }}
+          ref: refs/tags/${{ steps.release.outputs.tag }}
       - uses: actions/setup-node@v6
         with:
           node-version: 24
