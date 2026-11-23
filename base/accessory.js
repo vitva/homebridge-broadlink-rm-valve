@@ -329,7 +329,8 @@ class HomebridgeAccessory {
         qos: 0,
         retain: false
       },
-      rejectUnauthorized: false
+      // Verify TLS certificates by default. Self-signed brokers require an explicit opt-in.
+      rejectUnauthorized: config.mqttAllowInsecureTLS !== true
     };
 
     const mqttClient = mqtt.connect(mqttURL, options);

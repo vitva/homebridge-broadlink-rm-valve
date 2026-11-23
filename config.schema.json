@@ -277,6 +277,12 @@
               "type": "boolean",
               "default": false
             },
+            "mqttAllowInsecureTLS": {
+              "title": "Разрешить недоверенный TLS-сертификат MQTT",
+              "type": "boolean",
+              "default": false,
+              "description": "Только для MQTT-брокеров с самоподписанным или недоверенным сертификатом. Снижает безопасность соединения; по умолчанию проверка сертификата включена."
+            },
             "valveType": {
               "title": "Тип крана HomeKit",
               "type": "integer",

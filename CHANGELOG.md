@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.4.21-valve.4] - 2026-11-23
+
+### Security
+- Verify MQTT TLS certificates by default; self-signed broker certificates require the explicit `mqttAllowInsecureTLS: true` opt-in.
+- Remove the unused `js` runtime dependency and update development tooling to eliminate reported dependency vulnerabilities.
+- Use `Buffer.from()` instead of the deprecated Buffer constructor.
+
+### Validation
+- GitHub Actions passed on Node.js 22, 24, and 26, including Homebridge 2 HAP runtime checks, lint, and 139 automated tests.
+- Full and production npm dependency audits reported zero vulnerabilities.
+- The release-candidate npm archive was verified: all 88 packed files match the source tree, and required package entry points and configuration schema are present.
+
 ## [4.4.21-valve.3] - 2026-11-23
 
 ### Added

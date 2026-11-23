@@ -60,3 +60,17 @@ npm test
 ## Source and license
 
 This project is based on [kiwi-cam/homebridge-broadlink-rm](https://github.com/kiwi-cam/homebridge-broadlink-rm). The upstream Apache-2.0 license and attribution are retained.
+
+
+## MQTT security
+
+MQTT connections using TLS verify the broker certificate by default. If your broker intentionally uses a self-signed or otherwise untrusted certificate, you can explicitly opt in per accessory in JSON Config:
+
+```json
+{
+  "mqttURL": "mqtts://broker.example:8883",
+  "mqttAllowInsecureTLS": true
+}
+```
+
+Only enable `mqttAllowInsecureTLS` when you understand the risk. It disables TLS certificate validation and can expose MQTT credentials and messages to interception. The default is `false`.

@@ -1,0 +1,34 @@
+name: Audit published npm artifact
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Published npm version to audit (with or without leading v)
+        required: false
+        type: string
+  release:
+    types:
+      - published
+
+permissions:
+  contents: read
+
+jobs:
+  compare-published-tarball:
+    name: Compare npm tarball with published Git tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - name: Compare every published file with the exact Git tag
+        env:
+          EXPECTED_VERSION: ${{ inputs.version || github.event.release.tag_name || '4.4.21-valve.4' }}
+        run: bash scripts/audit-published-package.sh
