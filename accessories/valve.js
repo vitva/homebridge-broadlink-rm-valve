@@ -74,7 +74,7 @@ class ValveAccessory extends BroadlinkRMAccessory {
     const operation = this.commandQueue.then(async () => {
       const device = getDevice({ host: this.host, log: this.log });
       if (!device || typeof device.sendData !== 'function') {
-        throw new Error(\`Valve "\${this.name}" cannot send the command: no ready Broadlink RM device is available.\`);
+        throw new Error(`Valve "${this.name}" cannot send the command: no ready Broadlink RM device is available.`);
       }
 
       await this.performSend(command);
