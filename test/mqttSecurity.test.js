@@ -71,4 +71,9 @@ describe('MQTT TLS certificate verification', () => {
     connectWithConfig({ mqttAllowInsecureTLS: false });
     expect(captured.options.rejectUnauthorized).to.equal(true);
   });
+
+  it('ignores malformed MQTT topic array entries without throwing', () => {
+    connectWithConfig({ mqttTopic: [null] });
+    expect(captured).to.equal(null);
+  });
 });
