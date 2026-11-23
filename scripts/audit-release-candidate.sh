@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-EXPECTED_VERSION="${EXPECTED_VERSION:-4.4.21-valve.5}"
+EXPECTED_VERSION="${EXPECTED_VERSION:-$(node -p "require('./package.json').version")}"
 PACKAGE_NAME="homebridge-broadlink-rm-valve"
 ACTUAL_VERSION="$(node -p "require('./package.json').version")"
 
