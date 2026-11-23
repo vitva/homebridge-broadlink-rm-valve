@@ -15,8 +15,12 @@ describe('update checker', () => {
   });
   afterEach(() => {
     require.cache[checkerModulePath].exports = originalChecker;
-    if (originalHelper) require.cache[helperModulePath] = originalHelper;
-    else delete require.cache[helperModulePath];
+    if (originalHelper) {
+      require.cache[helperModulePath] = originalHelper;
+    } else {
+      delete require.cache[helperModulePath];
+    }
+
   });
   it('includes valve prereleases when checking for updates', () => {
     checkForUpdates(() => {});
