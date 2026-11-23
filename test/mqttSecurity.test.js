@@ -1,24 +1,43 @@
 /* eslint-disable linebreak-style */
 const { expect } = require('chai');
 const { EventEmitter } = require('node:events');
-const mqtt = require('mqtt');
-const HomebridgeAccessory = require('../base/accessory');
+
+const mqttModulePath = require.resolve('mqtt');
+require(mqttModulePath);
+const accessoryModulePath = require.resolve('../base/accessory');
 
 describe('MQTT TLS certificate verification', () => {
-  let originalConnect;
   let captured;
+  let originalMqttExports;
+  let originalAccessoryModule;
+  let HomebridgeAccessory;
 
   beforeEach(() => {
-    originalConnect = mqtt.connect;
     captured = null;
-    mqtt.connect = (url, options) => {
-      captured = { url, options };
-      return new EventEmitter();
+    originalMqttExports = require.cache[mqttModulePath].exports;
+    originalAccessoryModule = require.cache[accessoryModulePath];
+
+    // MQTT.js exposes connect through a read-only export getter. Replace the
+    // module export before loading the accessory instead of assigning to it.
+    require.cache[mqttModulePath].exports = {
+      connect: (url, options) => {
+        captured = { url, options };
+        return new EventEmitter();
+      }
     };
+
+    delete require.cache[accessoryModulePath];
+    HomebridgeAccessory = require('../base/accessory');
   });
 
   afterEach(() => {
-    mqtt.connect = originalConnect;
+    require.cache[mqttModulePath].exports = originalMqttExports;
+
+    if (originalAccessoryModule) {
+      require.cache[accessoryModulePath] = originalAccessoryModule;
+    } else {
+      delete require.cache[accessoryModulePath];
+    }
   });
 
   const connectWithConfig = (extraConfig = {}) => {
