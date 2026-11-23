@@ -52,6 +52,7 @@ HomeKit reports the last successfully sent command. Broadlink RM devices do not 
 
 ```sh
 npm ci
+npm install --no-save --package-lock=false @homebridge/hap-nodejs@2.3.0
 npm run lint
 npm test
 ```
