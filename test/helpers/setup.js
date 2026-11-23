@@ -1,4 +1,4 @@
-const hap = require('hap-nodejs');
+const hap = require('@homebridge/hap-nodejs');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
