@@ -31,7 +31,7 @@ const startPing = (device, log) => {
       ping.sys.probe(device.host.address, (active, err) => {
         if(err){
           log(`Error pinging Broadlink RM device at ${device.host.address} (${device.host.macAddress || ''}): ${err}`);
-          throw err;
+          return;
         }
         
         if (!active && device.state === 'active' && device.retryCount === 2) {
@@ -161,4 +161,4 @@ const getDevice = ({ host, log, learnOnly }) => {
   return device;
 }
 
-module.exports = { getDevice, discoverDevices, addDevice, resetDevices };
+module.exports = { getDevice, discoverDevices, addDevice, resetDevices, startPing };
