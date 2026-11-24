@@ -56,7 +56,7 @@ assert.ok(accessoryProperties.valveType);
 assert.ok(accessoryProperties.testMode);
 assert.equal(accessoryProperties.testMode.type, 'boolean');
 assert.ok(accessoryProperties.testMode.condition);
-assert.equal(accessoryProperties.testMode.condition.functionBody, 'return true;');
+assert.equal(accessoryProperties.testMode.condition.functionBody, "return model.accessories?.[arrayIndices]?.type === 'valve';");
 assert.ok(accessoryProperties.data.condition.functionBody.includes('testMode'));
 assert.ok(accessoryProperties.valveType.condition);
 assert.ok(accessoryProperties.data.condition);
