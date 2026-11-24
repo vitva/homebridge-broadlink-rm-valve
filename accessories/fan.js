@@ -79,10 +79,11 @@ class FanAccessory extends BroadlinkRMAccessory {
   }
 
   checkAutoOnOff() {
+    const { log, name } = this;
     this.reset();
-    this.checkPingGrace();
-    this.checkAutoOn();
-    this.checkAutoOff();
+    this.checkPingGrace().catch(error => log(`${name} ping grace error: ${error.message || error}`));
+    this.checkAutoOn().catch(error => log(`${name} automatic-on error: ${error.message || error}`));
+    this.checkAutoOff().catch(error => log(`${name} automatic-off error: ${error.message || error}`));
   }
 
   checkPing(ping) {
