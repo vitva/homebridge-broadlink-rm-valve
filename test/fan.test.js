@@ -480,6 +480,29 @@ describe('fanv1Accessory HomeKit compatibility', () => {
     expect(device.hasSentCode('OFF')).to.equal(true);
   });
 
+  it('restores the previous cached speed when a fan power command fails', async () => {
+    const { device } = setup();
+    const fan = new Fanv1(null, {
+      ...defaultConfig,
+      host: device.host.address,
+      defaultSpeedStep: 2
+    }, 'FakeServiceManager');
+    const failure = new Error('simulated fan power send failure');
+    fan.state.switchState = true;
+    fan.lastFanSpeed = 30;
+    fan.performSend = async () => { throw failure; };
+
+    let result;
+    try {
+      await fan.setSwitchState('ON', false);
+    } catch (error) {
+      result = error;
+    }
+
+    expect(result).to.equal(failure);
+    expect(fan.lastFanSpeed).to.equal(30);
+  });
+
   it('does not cache a requested speed when the Broadlink send fails', async () => {
     const { device } = setup();
     const fan = new Fanv1(null, {
