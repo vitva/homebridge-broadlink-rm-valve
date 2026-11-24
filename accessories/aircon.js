@@ -410,13 +410,6 @@ class AirConAccessory extends BroadlinkRMAccessory {
   // Device Temperature Methods
 
   async monitorTemperature () {
-    if (this.testMode) {
-      if (state.currentTemperature === undefined) {state.currentTemperature = 20;}
-      if (state.currentHumidity === undefined && !config.noHumidity) {state.currentHumidity = 50;}
-      this.updateTemperatureUI();
-      return;
-    }
-
     const { config, host, log, logLevel, name, state } = this;
     const { temperatureFilePath, pseudoDeviceTemperature, w1DeviceID, mqttURL } = config;
 
