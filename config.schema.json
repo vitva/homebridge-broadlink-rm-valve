@@ -1521,7 +1521,8 @@
             }
           },
           "additionalProperties": true
-        }
+        },
+        "title": "Аксессуары HomeKit"
       }
     }
   }
