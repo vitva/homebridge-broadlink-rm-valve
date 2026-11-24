@@ -43,7 +43,7 @@ describe('Homebridge plugin runtime registration', () => {
         persistState: false,
         data: { open: 'OPEN', close: 'CLOSE' }
       }]
-    }););
+    });
 
     const accessories = await new Promise((resolve, reject) => {
       platform.accessories(resolve).catch(reject);
