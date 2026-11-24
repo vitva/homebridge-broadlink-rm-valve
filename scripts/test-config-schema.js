@@ -14,7 +14,14 @@ assert.ok(platformProperties.name);
 assert.ok(platformProperties.accessories);
 assert.ok(platformProperties.hosts);
 
-const accessoryProperties = platformProperties.accessories.items.properties;
+const accessoryArray = platformProperties.accessories;
+assert.equal(accessoryArray.type, 'array');
+assert.equal(accessoryArray.items.type, 'object');
+assert.equal(accessoryArray.items.additionalProperties, true, 'Accessory items must allow legacy config keys');
+assert.equal(Object.hasOwn(accessoryArray.items.properties, 'additionalProperties'), false, 'additionalProperties must not be declared as an accessory field');
+assert.equal(Object.hasOwn(accessoryArray.items.properties.data.properties, 'additionalProperties'), false, 'additionalProperties must not be declared as a Broadlink command field');
+assert.equal(Object.hasOwn(accessoryArray, 'title'), false, 'The fieldset supplies the single Accessories heading');
+const accessoryProperties = accessoryArray.items.properties;
 const supportedTypes = accessoryProperties.type.oneOf.map(option => option.enum[0]);
 const expectedTypes = [
   'air-conditioner',
@@ -100,7 +107,7 @@ const expectedCommandSettings = [
 ];
 expectedCommandSettings.forEach(key => assert.ok(accessoryProperties.data.properties[key], `Missing command setting: data.${key}`));
 assert.equal(accessoryProperties.data.additionalProperties, true);
-assert.equal(accessoryProperties.additionalProperties, true);
+assert.equal(accessoryArray.items.additionalProperties, true);
 assert.ok(accessoryProperties.data.properties.remote.properties.arrowUp);
 assert.ok(accessoryProperties.data.properties.inputs.items.properties.data);
 assert.ok(accessoryProperties.data.properties.cool.properties.temperatureCodes);
