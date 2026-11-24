@@ -188,6 +188,16 @@ class TVAccessory extends BroadlinkRMAccessory {
     const { data, name, config, serviceManagerType, log } = this;
     const { on, off } = data || {};
 
+    const sendAndAcknowledge = (hexData, callback, label, onFailure) => {
+      this.performSend(hexData).then(() => {
+        callback(null);
+      }).catch(error => {
+        if (onFailure) {onFailure();}
+        log(`${name} ${label} error: ${error.message || error}`);
+        callback(error);
+      });
+    };
+
     this.serviceManagers = [];
     this.serviceManager = new ServiceManagerTypes[serviceManagerType](
       name,
@@ -232,10 +242,11 @@ class TVAccessory extends BroadlinkRMAccessory {
           return;
         }
 
+        const previousInput = this.state.input;
         this.state.input = newValue;
-        this.performSend(data.inputs[newValue].data);
-
-        callback(null);
+        sendAndAcknowledge(data.inputs[newValue].data, callback, 'Input', () => {
+          this.state.input = previousInput;
+        });
       });
 
     this.serviceManager
@@ -296,8 +307,7 @@ class TVAccessory extends BroadlinkRMAccessory {
           return;
         }
 
-        this.performSend(hexData);
-        callback(null);
+        sendAndAcknowledge(hexData, callback, 'Remote command');
       });
 
     this.serviceManager
@@ -337,8 +347,7 @@ class TVAccessory extends BroadlinkRMAccessory {
           return;
         }
 
-        this.performSend(hexData);
-        callback(null);
+        sendAndAcknowledge(hexData, callback, 'Remote command');
       });
 
     const speakerService = new Service.TelevisionSpeaker('Speaker', 'Speaker');
@@ -381,8 +390,7 @@ class TVAccessory extends BroadlinkRMAccessory {
           return;
         }
 
-        this.performSend(hexData);
-        callback(null);
+        sendAndAcknowledge(hexData, callback, 'Remote command');
       });
     speakerService
       .getCharacteristic(Characteristic.Mute)
@@ -404,8 +412,7 @@ class TVAccessory extends BroadlinkRMAccessory {
           return;
         }
 
-        this.performSend(hexData);
-        callback(null);         
+        sendAndAcknowledge(hexData, callback, 'Remote command');         
       });
 
     this.serviceManagers.push(speakerService);
