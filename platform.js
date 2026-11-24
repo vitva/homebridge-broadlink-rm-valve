@@ -73,7 +73,9 @@ const BroadlinkRMPlatform = class extends HomebridgePlatform {
     }
 
     // Add a Learn Code accessory if none exist in the config
-    const learnIRAccessories = configuredAccessories.filter((accessory) => (accessory.type === 'learn-ir' || accessory.type === 'learn-code'));
+    const learnIRAccessories = configuredAccessories.filter((accessory) =>
+      !accessory.disabled && (accessory.type === 'learn-ir' || accessory.type === 'learn-code')
+    );
 
     if (learnIRAccessories.length === 0) {
 
