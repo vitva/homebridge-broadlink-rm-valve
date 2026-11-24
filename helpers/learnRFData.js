@@ -245,9 +245,12 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
     session.timeoutStopTimer = setTimeout(() => {
       if (!session.active) {return;}
       log(`\x1b[35m[INFO]\x1b[0m Scan RF (stopped - 60s timeout)`);
+      const isCurrentSession = currentSession === session;
       closeSession(session);
-      if (currentSession === session) {currentSession = null;}
-      turnOffOnce();
+      if (isCurrentSession) {
+        currentSession = null;
+        turnOffOnce();
+      }
     }, 1000);
   }, 60 * 1000);
 };
