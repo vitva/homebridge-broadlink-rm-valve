@@ -502,6 +502,11 @@ class AirConAccessory extends BroadlinkRMAccessory {
     const callbackIdentifier = uuid.v4();
     this.temperatureCallbackQueue[callbackIdentifier] = callback;
 
+    if (this.testMode) {
+      this.processQueuedTemperatureCallbacks(state.currentTemperature === undefined ? 20 : state.currentTemperature);
+      return;
+    }
+
     // Read temperature from file
     if (temperatureFilePath) {
       this.updateTemperatureFromFile();
