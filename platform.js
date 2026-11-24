@@ -56,7 +56,11 @@ const BroadlinkRMPlatform = class extends HomebridgePlatform {
       return;
     }
 
-    this.discoverBroadlinkDevices();
+    try {
+      this.discoverBroadlinkDevices();
+    } catch (error) {
+      log(`[CONFIG ERROR] Broadlink device discovery could not be configured: ${error.message || error}`);
+    }
     this.showMessage();
     if (!config.isUnitTest) {
       setTimeout(() => checkForUpdates(log), 1800);
@@ -81,11 +85,23 @@ const BroadlinkRMPlatform = class extends HomebridgePlatform {
     // Iterate through the config accessories
     const tvs = [];
     configuredAccessories.forEach((accessory) => {
-      if (!accessory.type) {throw new Error(`Each accessory must be configured with a "type". e.g. "switch"`);}
       if (accessory.disabled) {return;}
-      if (!classTypes[accessory.type]) {throw new Error(`homebridge-broadlink-rm-valve doesn't support accessories of type "${accessory.type}".`);}
+      if (!accessory.type) {
+        log(`[CONFIG ERROR] Skipping accessory "${accessory.name || 'unnamed'}": an accessory type is required.`);
+        return;
+      }
+      if (!classTypes[accessory.type]) {
+        log(`[CONFIG ERROR] Skipping accessory "${accessory.name || 'unnamed'}": unsupported type "${accessory.type}".`);
+        return;
+      }
 
-      const homeKitAccessory = new classTypes[accessory.type](log, accessory);
+      let homeKitAccessory;
+      try {
+        homeKitAccessory = new classTypes[accessory.type](log, accessory);
+      } catch (error) {
+        log(`[CONFIG ERROR] Could not initialize accessory "${accessory.name || accessory.type}": ${error.message || error}`);
+        return;
+      }
 
       if (classTypes[accessory.type] === classTypes.tv) {
         const tvSubType = (accessory.subType || 'tv').toLowerCase();
