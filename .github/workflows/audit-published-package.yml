@@ -28,7 +28,29 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 22
+      - name: Resolve the published version to audit
+        id: audit-version
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          INPUT_VERSION: ${{ inputs.version || '' }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || '' }}
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+            VERSION="$(git show "$BASE_SHA:package.json" | node -e 'let data = ""; process.stdin.on("data", chunk => data += chunk).on("end", () => process.stdout.write(JSON.parse(data).version));')"
+          elif [[ -n "$INPUT_VERSION" ]]; then
+            VERSION="$INPUT_VERSION"
+          elif [[ -n "$RELEASE_TAG" ]]; then
+            VERSION="$RELEASE_TAG"
+          else
+            VERSION="$(node -p "require('./package.json').version")"
+          fi
+          VERSION="${VERSION#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Auditing already-published version $VERSION"
+
       - name: Compare every published file with the exact Git tag
         env:
-          EXPECTED_VERSION: ${{ inputs.version || github.event.release.tag_name || '' }}
+          EXPECTED_VERSION: ${{ steps.audit-version.outputs.version }}
         run: bash scripts/audit-published-package.sh
