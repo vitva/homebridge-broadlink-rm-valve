@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fall back to the last sensor reading when temperature, humidity, or 1-Wire source files cannot be read; avoid exceptions in asynchronous file callbacks.
 - Await humidifier state transitions and Broadlink power commands, and log asynchronous fan timer errors.
 - Sanitize user-controlled humidifier history filenames so path separators cannot escape the Homebridge storage directory.
+- Wait for HomeKit setter actions and Broadlink sends to finish before acknowledging writes; return command failures through the HomeKit callback.
+- Catch temperature monitor failures and await retry chains instead of leaving rejected promises unhandled.
 - Use the correct numeric HomeKit Active values for Fan v2 and TV while retaining the Boolean On characteristic for Fan v1.
 
 ### Tests
