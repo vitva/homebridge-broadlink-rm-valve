@@ -761,7 +761,7 @@
               },
               "additionalProperties": true,
               "condition": {
-                "functionBody": "const type = model.accessories?.[arrayIndices]?.type; return !!type && !(type === 'valve' && model.accessories?.[arrayIndices]?.testMode === true);"
+                "functionBody": "const item = model.accessories?.[arrayIndices]; return !!item && item.testMode !== true;"
               }
             },
             "subType": {
