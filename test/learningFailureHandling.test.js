@@ -110,4 +110,26 @@ describe('learning failure handling', () => {
     expect(device.listenerCount('rawRFData2')).to.equal(0);
     expect(device.listenerCount('rawData')).to.equal(0);
   });
+
+  it('does not let delayed cleanup from a stopped RF scan close a new scan', async function () {
+    this.timeout(3000);
+    const { device } = setup();
+
+    learnRFData.start(undefined, () => {}, () => {}, log, true, 2);
+    learnRFData.stop(log);
+    learnRFData.start(undefined, () => {}, () => {}, log, true, 2);
+
+    await wait(600);
+
+    expect(device.listenerCount('rawRFData')).to.equal(1);
+    expect(device.listenerCount('rawRFData2')).to.equal(1);
+    expect(device.listenerCount('rawData')).to.equal(1);
+
+    learnRFData.stop(log);
+    await wait(600);
+
+    expect(device.listenerCount('rawRFData')).to.equal(0);
+    expect(device.listenerCount('rawRFData2')).to.equal(0);
+    expect(device.listenerCount('rawData')).to.equal(0);
+  });
 });
