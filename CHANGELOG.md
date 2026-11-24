@@ -1,3 +1,13 @@
+## [4.4.21-valve.10] - 2026-11-24
+
+### Added
+- Add a per-Valve test mode that simulates open/close actions without a Broadlink RM device or HEX commands.
+- Expose the test-mode toggle in Homebridge Config UI and hide Broadlink command fields while it is enabled.
+- Add integration coverage that creates a real HAP Valve service and exercises simulated state changes without a device.
+
+### Validation
+- Automated CI must pass on Node.js 22, 24, and 26 before release.
+
 ## [4.4.21-valve.9] - 2026-11-24
 
 ### Fixed
