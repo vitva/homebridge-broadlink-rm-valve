@@ -1,3 +1,13 @@
+## [4.4.21-valve.9] - 2026-11-24
+
+### Fixed
+- Remove the legacy custom form layout that prevented Homebridge Config UI from generating the HomeKit accessory array editor.
+- Let Config UI X render the accessory editor from JSON Schema, retaining the existing accessory types and Valve type.
+
+### Validation
+- Pull request checks passed on Node.js 22, 24, and 26, including lint, tests, and release archive checks.
+- The published `.8` package remains unchanged; this release contains the Config UI editor fix.
+
 # Changelog
 ## [4.4.21-valve.7] - 2026-11-24
 
