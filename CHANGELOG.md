@@ -28,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use the correct numeric HomeKit Active values for Fan v2 and TV while retaining the Boolean On characteristic for Fan v1.
 
 ### Tests
-- Add regression coverage for empty platform configuration, asynchronous ping failures, and HomeKit characteristic formats.
+- Add regression coverage for empty platform configuration, asynchronous ping failures, HomeKit characteristic formats, and persistence-path confinement.
 
 ### Validation
 - GitHub Actions passed on Node.js 22, 24, and 26.
