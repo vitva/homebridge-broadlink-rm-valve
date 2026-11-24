@@ -249,6 +249,11 @@ class HumidifierDehumidifierAccessory extends FanAccessory {
     // Add a new callback
     const callbackIdentifier = uuid.v4();
     this.humidityCallbackQueue[callbackIdentifier] = callback;
+
+    if (this.testMode) {
+      this.processQueuedHumidityCallbacks(state.currentHumidity === undefined ? 50 : state.currentHumidity);
+      return;
+    }
     
     // Read temperature from file
     if (config.humidityFilePath) {
