@@ -61,12 +61,12 @@ class BroadlinkRMAccessory extends HomebridgeAccessory {
     if(this.config.disableLogs) {this.logLevel = 6;}  
   }
 
-  performSetValueAction ({ host, data, log, name, logLevel }) {
+  async performSetValueAction ({ host, data, log, name, logLevel }) {
     if (this.testMode) {
       log(`${name} test mode: simulated Broadlink command.`);
       return;
     }
-    sendData({ host, hexData: data, log, name, logLevel });
+    await sendData({ host, hexData: data, log, name, logLevel });
   }
   
   reset () {
