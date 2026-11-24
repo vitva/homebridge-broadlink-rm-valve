@@ -712,7 +712,6 @@
                     "functionBody": "return model.accessories?.[arrayIndices]?.type === 'tv';"
                   }
                 },
-                "additionalProperties": true,
                 "cool": {
                   "title": "Команды охлаждения",
                   "type": "object",
