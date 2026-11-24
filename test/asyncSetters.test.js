@@ -2,6 +2,7 @@ const { expect } = require('chai');
 
 const HomebridgeAccessory = require('../base/accessory');
 const { TV } = require('../accessories');
+const HumidifierDehumidifierAccessory = require('../accessories/humidifier-dehumidifier');
 const { log, setup } = require('./helpers/setup');
 
 const makeAccessory = () => {
@@ -56,6 +57,35 @@ describe('asynchronous HomeKit setters', () => {
 
     expect(result).to.equal(failure);
     expect(accessory.state.switchState).to.equal(false);
+  });
+
+  it('waits for dehumidifier state transitions before completing the HomeKit setter action', async () => {
+    const accessory = Object.create(HumidifierDehumidifierAccessory.prototype);
+    accessory.config = { preventResendHex: false };
+    accessory.name = 'Async humidifier test';
+    accessory.log = () => {};
+    accessory.logLevel = 2;
+    accessory.state = {
+      HumidifierThreshold: 40,
+      DehumidifierThreshold: 60,
+      currentState: Characteristic.CurrentHumidifierDehumidifierState.IDLE
+    };
+    accessory.getDesiredState = () => Characteristic.CurrentHumidifierDehumidifierState.DEHUMIDIFYING;
+
+    let resolveTransition;
+    accessory.setCurrentState = () => new Promise(resolve => { resolveTransition = resolve; });
+    let settled = false;
+    const action = Promise.resolve(accessory.setDehumidifierThreshold('DEHUMIDIFY', 55))
+      .then(() => { settled = true; });
+
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(resolveTransition).to.be.a('function');
+    expect(settled).to.equal(false);
+
+    resolveTransition();
+    await action;
+    expect(settled).to.equal(true);
   });
 
   it('waits for TV input commands before acknowledging the HomeKit write', async () => {
