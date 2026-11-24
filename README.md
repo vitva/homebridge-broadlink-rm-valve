@@ -83,9 +83,11 @@ MQTT connections using TLS verify the broker certificate by default. If your bro
 
 Only enable `mqttAllowInsecureTLS` when you understand the risk. It disables TLS certificate validation and can expose MQTT credentials and messages to interception. The default is `false`.
 
-## Valve test mode (no Broadlink hardware)
+## Accessory test mode (no Broadlink hardware)
 
-To add a virtual valve for testing Apple Home, configure it with `testMode: true`. Do not add HEX commands or a Broadlink host in this mode:
+Every accessory type has a **Тестовый режим (без Broadlink)** checkbox. Enable it on an accessory to simulate its HomeKit actions without a Broadlink RM device or HEX commands. Command fields are hidden while test mode is enabled. Temperature and humidity accessories use simulated readings (20 °C and 50% RH). The accessory remains a normal HomeKit service; no Broadlink commands are transmitted.
+
+For example, a virtual valve can be configured as:
 
 ```json
 {
@@ -96,4 +98,4 @@ To add a virtual valve for testing Apple Home, configure it with `testMode: true
 }
 ```
 
-After saving and restarting Homebridge, the valve should appear as a HomeKit Valve accessory. Open and Close actions only update the simulated HomeKit state; no Broadlink commands are sent. Turn test mode off and configure separate `data.open` and `data.close` commands before controlling a real valve.
+Turn test mode off and configure the accessory's normal Broadlink commands before using it with real hardware.
