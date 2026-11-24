@@ -725,12 +725,6 @@
               "type": "string",
               "oneOf": [
                 {
-                  "title": "Телевизор",
-                  "enum": [
-                    "tv"
-                  ]
-                },
-                {
                   "title": "Приставка (STB)",
                   "enum": [
                     "stb"
