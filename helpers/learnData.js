@@ -77,6 +77,7 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
     log(`\x1b[35m[INFO]\x1b[0m Learn Code (complete)`);
 
     closeClient();
+    closeClient = null;
 
     turnOffOnce();
   };
@@ -113,6 +114,7 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
     }
 
     closeClient();
+    closeClient = null;
 
     turnOffOnce();
   }, 10000); // 10s
