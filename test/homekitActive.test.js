@@ -42,7 +42,7 @@ describe('HomeKit Active characteristic value compatibility', () => {
     expect(purifier.state.currentState).to.equal(Characteristic.CurrentAirPurifierState.INACTIVE);
   });
 
-  it('uses numeric Active values for Fan v2', () => {
+  it('uses numeric Active values for Fan v2', async () => {
     const { device } = setup();
     const fan = new Fan(log, {
       ...baseConfig,
@@ -53,13 +53,15 @@ describe('HomeKit Active characteristic value compatibility', () => {
     expect(active.props.format).to.equal('uint8');
 
     fan.serviceManager.setCharacteristic(Characteristic.Active, Characteristic.Active.ACTIVE);
+    await delayForDuration(0.05);
     expect(active.value).to.equal(Characteristic.Active.ACTIVE);
 
     fan.serviceManager.setCharacteristic(Characteristic.Active, Characteristic.Active.INACTIVE);
+    await delayForDuration(0.05);
     expect(active.value).to.equal(Characteristic.Active.INACTIVE);
   });
 
-  it('keeps Boolean On values for legacy Fan v1', () => {
+  it('keeps Boolean On values for legacy Fan v1', async () => {
     const { device } = setup();
     const fan = new Fanv1(log, {
       ...baseConfig,
@@ -70,13 +72,15 @@ describe('HomeKit Active characteristic value compatibility', () => {
     expect(power.props.format).to.equal('bool');
 
     fan.serviceManager.setCharacteristic(Characteristic.On, true);
+    await delayForDuration(0.05);
     expect(power.value).to.equal(true);
 
     fan.serviceManager.setCharacteristic(Characteristic.On, false);
+    await delayForDuration(0.05);
     expect(power.value).to.equal(false);
   });
 
-  it('uses numeric Active values for Television', () => {
+  it('uses numeric Active values for Television', async () => {
     const { device } = setup();
     const tv = new TV(log, {
       ...baseConfig,
@@ -87,9 +91,11 @@ describe('HomeKit Active characteristic value compatibility', () => {
     expect(active.props.format).to.equal('uint8');
 
     tv.serviceManager.setCharacteristic(Characteristic.Active, Characteristic.Active.ACTIVE);
+    await delayForDuration(0.05);
     expect(active.value).to.equal(Characteristic.Active.ACTIVE);
 
     tv.serviceManager.setCharacteristic(Characteristic.Active, Characteristic.Active.INACTIVE);
+    await delayForDuration(0.05);
     expect(active.value).to.equal(Characteristic.Active.INACTIVE);
   });
 });
