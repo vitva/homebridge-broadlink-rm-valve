@@ -11,12 +11,12 @@ const stop = (log, device, logLevel) => {
   closeClient();
   closeClient = null;
 
-  log(`\x1b[35m[INFO]\x1b[0m Learn Code (stopped)`);
+  if (log) {log(`\x1b[35m[INFO]\x1b[0m Learn Code (stopped)`);}
   if(this.initalDebug !== undefined && device) {device.debug = this.initalDebug;}
 }
 
 const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) => {
-  stop()
+  stop(log)
 
   // Get the Broadlink device
   let callbackCalled = false;
