@@ -19,15 +19,38 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
   stop()
 
   // Get the Broadlink device
+  let callbackCalled = false;
+  let turnOffCalled = false;
+  const completeStart = (error) => {
+    if (callbackCalled) {return;}
+    callbackCalled = true;
+    if (callback) {callback(error || null);}
+  };
+  const turnOffOnce = () => {
+    if (turnOffCalled) {return;}
+    turnOffCalled = true;
+    if (turnOffCallback) {turnOffCallback();}
+  };
+
   const device = getDevice({ host, log, learnOnly: true });
   if (!device) {
-    return log(`\x1b[31m[ERROR]\x1b[0m Learn Code (Couldn't learn code, device not found)`);
+    const error = new Error('Broadlink device not found');
+    log(`\x1b[31m[ERROR]\x1b[0m Learn Code (${error.message})`);
+    completeStart(error);
+    turnOffOnce();
+    return;
   }  
 
   this.initalDebug = device.debug;
   if (logLevel <=1) {device.debug = true;}
 
-  if (!device.enterLearning) {return log(`\x1b[31m[ERROR]\x1b[0m Learn Code (IR learning not supported for device at ${host})`);}
+  if (!device.enterLearning) {
+    const error = new Error(`IR learning not supported for device at ${host}`);
+    log(`\x1b[31m[ERROR]\x1b[0m Learn Code (${error.message})`);
+    completeStart(error);
+    turnOffOnce();
+    return;
+  }
 
   let onRawData
 
@@ -55,7 +78,7 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
 
     closeClient();
 
-    turnOffCallback();
+    turnOffOnce();
   };
 
   device.on('rawData', onRawData);
@@ -66,11 +89,13 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
     log(`\x1b[31m[ERROR]\x1b[0m Learn Code (could not start learning: ${error.message || error})`);
     closeClient();
     closeClient = null;
+    completeStart(error);
+    turnOffOnce();
     return;
   }
   log(`Learn Code (ready)`);
 
-  if (callback) {callback();}
+  completeStart();
 
   getDataTimeout = setTimeout(() => {
     getData(device, log);
@@ -89,7 +114,7 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
 
     closeClient();
 
-    turnOffCallback();
+    turnOffOnce();
   }, 10000); // 10s
 }
 
@@ -102,6 +127,7 @@ const getData = (device, log) => {
   } catch (error) {
     log(`\x1b[31m[ERROR]\x1b[0m Learn Code (failed to request learned data: ${error.message || error})`);
     stop(log, device);
+    if (turnOffCallback) {turnOffOnce();}
     return;
   }
 
