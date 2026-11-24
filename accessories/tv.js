@@ -6,6 +6,10 @@ const arp = require('../helpers/arp');
 const BroadlinkRMAccessory = require('./accessory');
 
 class TVAccessory extends BroadlinkRMAccessory {
+  getActiveValue (active) {
+    return active ? Characteristic.Active.ACTIVE : Characteristic.Active.INACTIVE;
+  }
+
   constructor(log, config = {}, serviceManagerType) {
     super(log, config, serviceManagerType);
 
