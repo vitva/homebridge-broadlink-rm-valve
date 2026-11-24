@@ -4,6 +4,10 @@ const catchDelayCancelError = require('../helpers/catchDelayCancelError');
 const delayForDuration = require('../helpers/delayForDuration');
 
 class Fanv1Accessory extends FanAccessory {
+  getPowerCharacteristic () {
+    return Characteristic.On;
+  }
+
   setDefaults () {
     super.setDefaults();
     const { config, state } = this;
