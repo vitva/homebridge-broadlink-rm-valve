@@ -1,4 +1,5 @@
 const ServiceManagerTypes = require('../helpers/serviceManagerTypes');
+const sendData = require('../helpers/sendData');
 const delayForDuration = require('../helpers/delayForDuration');
 const SwitchAccessory = require('./switch');
 const catchDelayCancelError = require('../helpers/catchDelayCancelError');
@@ -45,7 +46,7 @@ class SwitchRepeatAccessory extends SwitchAccessory {
     
       // Itterate through each hex config in the array
       for (let index = 0; index < sendCount; index++) {
-        await this.performSend(hexData);
+        sendData({ host, hexData, log, name, logLevel });
 
         if (index < sendCount - 1) {
           this.intervalTimeoutPromise = delayForDuration(interval);
