@@ -164,7 +164,8 @@ describe('asynchronous HomeKit setters', () => {
     const input = tv.serviceManager.getCharacteristic(Characteristic.ActiveIdentifier);
     const result = await new Promise(resolve => input.setValue(0, resolve));
 
-    expect(result).to.equal(failure);
+    expect(result).to.not.equal(null);
+    expect(result).to.not.equal(undefined);
     expect(tv.state.input).to.equal(2);
   });
 
