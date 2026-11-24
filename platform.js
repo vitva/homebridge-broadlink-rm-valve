@@ -45,14 +45,22 @@ const BroadlinkRMPlatform = class extends HomebridgePlatform {
   addAccessories (accessories) {
     const { config, log, logLevel } = this;
 
+    if (config.accessories === undefined) {config.accessories = [];}
+    const configuredAccessories = filterConfiguredAccessories(config.accessories, log, logLevel);
+    const activeAccessories = configuredAccessories.filter((accessory) => accessory.type && !accessory.disabled);
+
+    // Verified by Homebridge requires the plugin to remain idle until configured.
+    // Do not discover devices or publish the built-in learning accessories for an empty config.
+    if (activeAccessories.length === 0) {
+      if (logLevel <= 2) {log('No enabled accessories are configured; Broadlink RM platform will remain idle.');}
+      return;
+    }
+
     this.discoverBroadlinkDevices();
     this.showMessage();
     if (!config.isUnitTest) {
       setTimeout(() => checkForUpdates(log), 1800);
     }
-
-    if (config.accessories === undefined) {config.accessories = [];}
-    const configuredAccessories = filterConfiguredAccessories(config.accessories, log, logLevel);
 
     // Add a Learn Code accessory if none exist in the config
     const learnIRAccessories = configuredAccessories.filter((accessory) => (accessory.type === 'learn-ir' || accessory.type === 'learn-code'));
