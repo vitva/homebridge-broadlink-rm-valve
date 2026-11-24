@@ -469,11 +469,13 @@ describe('fanv1Accessory HomeKit compatibility', () => {
       enableAutoOff: false
     }, 'FakeServiceManager');
 
-    await fan.serviceManager.setCharacteristic(Characteristic.On, true);
+    fan.serviceManager.setCharacteristic(Characteristic.On, true);
+    await delayForDuration(0.1);
     expect(fan.state.switchState).to.equal(true);
     expect(device.hasSentCode('ON')).to.equal(true);
 
-    await fan.serviceManager.setCharacteristic(Characteristic.On, false);
+    fan.serviceManager.setCharacteristic(Characteristic.On, false);
+    await delayForDuration(0.1);
     expect(fan.state.switchState).to.equal(false);
     expect(device.hasSentCode('OFF')).to.equal(true);
   });
