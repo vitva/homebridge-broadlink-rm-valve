@@ -40,7 +40,7 @@ const expectedTypes = [
   'heater-cooler',
   'valve'
 ];
-expectedTypes.forEach(type => assert.ok(supportedTypes.includes(type), `Missing UI accessory type: ${type}`));
+assert.deepEqual(supportedTypes, expectedTypes, 'The original accessory type order must be preserved and Valve appended');
 
 assert.ok(accessoryProperties.data.properties.open);
 assert.ok(accessoryProperties.data.properties.close);
@@ -86,7 +86,9 @@ const expectedAccessorySettings = [
   'humidityAdjustment', 'minTemperature', 'maxTemperature', 'tempStepSize',
   'heatOnly', 'coolOnly', 'defaultCoolTemperature', 'defaultHeatTemperature',
   'humidifierOnly', 'deHumidifierOnly', 'batteryAlerts', 'w1Device',
-  'defaultMode', 'coolingThresholdTemperature', 'heatingThresholdTemperature'
+  'defaultMode', 'coolingThresholdTemperature', 'heatingThresholdTemperature',
+  'autoCoolTemperature', 'autoHeatTemperature', 'autoMinimumDuration',
+  'sendOnWhenOff', 'autoSwitchName', 'lockUnlockDuration'
 ];
 expectedAccessorySettings.forEach(key => assert.ok(accessoryProperties[key], `Missing accessory setting: ${key}`));
 
@@ -101,5 +103,7 @@ assert.equal(accessoryProperties.data.additionalProperties, true);
 assert.equal(accessoryProperties.additionalProperties, true);
 assert.ok(accessoryProperties.data.properties.remote.properties.arrowUp);
 assert.ok(accessoryProperties.data.properties.inputs.items.properties.data);
+assert.ok(accessoryProperties.data.properties.cool.properties.temperatureCodes);
+assert.ok(accessoryProperties.data.properties.heat.properties.temperatureCodes);
 
 console.log('PASS: Homebridge Config UI schema exposes all legacy accessory types and type-specific commands');
