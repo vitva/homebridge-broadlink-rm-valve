@@ -1,7 +1,7 @@
 const { getDevice } = require('./getDevice');
 
 let closeClient = null;
-let isClosingClient = false;
+let closingClientPending = null;
 let timeout = null;
 let getDataTimeout = null;
 let getDataTimeout2 = null;
@@ -10,28 +10,35 @@ let getDataTimeout3 = null;
 let currentDevice
 
 const stop = (log, device, logLevel) => {
-  // Reset existing learn requests
-  if (!closeClient || isClosingClient) {return;}
+  // Close only the session that was active when stop was requested.
+  const closingClient = closeClient;
+  const closingDevice = currentDevice;
+  if (!closingClient || closingClientPending === closingClient) {return;}
 
-  isClosingClient = true;
+  closingClientPending = closingClient;
 
-  if (currentDevice) {
+  if (closingDevice) {
     try {
-      currentDevice.cancelLearn();
+      closingDevice.cancelLearn();
     } catch (error) {
       if (log) {log(`Scan RF cancel error: ${error.message || error}`);}
     }
   }
 
   setTimeout(() => {
-    closeClient();
-    closeClient = null;
-    isClosingClient = false;
+    closingClient();
+    // A new scan may have started during the 500 ms RF shutdown delay.
+    // Never let cleanup from the old scan close or reset the new one.
+    if (closeClient === closingClient) {
+      closeClient = null;
+      if (currentDevice === closingDevice) {currentDevice = null;}
+    }
+    if (closingClientPending === closingClient) {closingClientPending = null;}
 
-    if (log) {log(`\x1b[35m[INFO]\x1b[0m Scan RF (stopped)`);}
-  }, 500)
+    if (log) {log(`\\x1b[35m[INFO]\\x1b[0m Scan RF (stopped)`);}
+  }, 500);
 
-  if(this.initalDebug !== undefined && currentDevice) {currentDevice.debug = this.initalDebug;}
+  if(this.initalDebug !== undefined && closingDevice) {closingDevice.debug = this.initalDebug;}
 }
 
 const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) => {
@@ -60,7 +67,6 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
       closeClient();
       closeClient = null;
     }
-    isClosingClient = false;
     currentDevice = null;
     completeStart(error);
     turnOffOnce();
