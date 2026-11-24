@@ -42,7 +42,7 @@ Requires Node.js 22.12 or newer (22, 24, or 26) and Homebridge 2.x.
 
 Open **Plugins → Homebridge Broadlink RM Pro + Valve → Settings** to configure the platform, discover or manually enter RM devices, and add accessories.
 
-The platform remains idle until at least one supported, enabled accessory is configured. Once an accessory is configured, the built-in **Learn** and **Scan Frequency** accessories are added automatically unless hidden in the platform settings. You can also add a **Learn Code** accessory explicitly.
+The platform remains idle until at least one supported, enabled accessory is configured. Once an accessory is configured, the built-in **Learn** and **Scan Frequency** accessories are added automatically unless a **Learn Code** accessory is already configured or the buttons are hidden in platform settings.
 
 For a valve, choose **Кран (Valve)** and enter two separate learned commands in **Команды Broadlink**:
 
