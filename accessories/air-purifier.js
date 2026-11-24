@@ -24,7 +24,7 @@ class AirPurifierAccessory extends FanAccessory {
   updateCurrentState() {
     const { log, name, state, serviceManager } = this;
 
-    if (state.switchState === true) {
+    if (state.switchState) {
       log(`${name} updateCurrentState: changing to purifying`);
       state.currentState = Characteristic.CurrentAirPurifierState.PURIFYING_AIR
     } else {
