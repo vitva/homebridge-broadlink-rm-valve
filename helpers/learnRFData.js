@@ -35,7 +35,7 @@ const stop = (log, device, logLevel) => {
     }
     if (closingClientPending === closingClient) {closingClientPending = null;}
 
-    if (log) {log(`\\x1b[35m[INFO]\\x1b[0m Scan RF (stopped)`);}
+    if (log) {log(`\x1b[35m[INFO]\x1b[0m Scan RF (stopped)`);}
   }, 500);
 
   if(this.initalDebug !== undefined && closingDevice) {closingDevice.debug = this.initalDebug;}
