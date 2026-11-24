@@ -62,21 +62,36 @@ describe('valveAccessory', () => {
     expect(valve.state.active).to.equal(Characteristic.Active.INACTIVE);
   });
 
+
   it('creates a HomeKit Valve and simulates open/close without a Broadlink device or HEX commands', async () => {
     const { platform } = setup({
       hideLearnButton: true,
       hideScanFrequencyButton: true,
-      accessories: [{ type: 'valve', name: 'Virtual test valve', testMode: true, persistState: false }]
+      accessories: [{
+        type: 'valve',
+        name: 'Virtual test valve',
+        testMode: true,
+        persistState: false
+      }]
     });
-    const accessories = await new Promise((resolve, reject) => platform.accessories(resolve).catch(reject));
+
+    const accessories = await new Promise((resolve, reject) => {
+      platform.accessories(resolve).catch(reject);
+    });
+
     expect(accessories).to.have.length(1);
     const valve = accessories[0];
     const valveService = valve.getServices().find(service => service.UUID === Service.Valve.UUID);
     expect(valveService).to.exist;
+    expect(valveService.getCharacteristic(Characteristic.ValveType).value).to.equal(3);
+
+    // Remove the fake device installed by the shared test setup: test mode must not need it.
     require('../helpers/getDevice').resetDevices();
+
     await setActive(valve, Characteristic.Active.ACTIVE);
     expect(valve.state.active).to.equal(Characteristic.Active.ACTIVE);
     expect(valve.state.inUse).to.equal(Characteristic.InUse.IN_USE);
+
     await setActive(valve, Characteristic.Active.INACTIVE);
     expect(valve.state.active).to.equal(Characteristic.Active.INACTIVE);
     expect(valve.state.inUse).to.equal(Characteristic.InUse.NOT_IN_USE);
