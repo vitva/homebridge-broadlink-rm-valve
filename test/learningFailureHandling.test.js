@@ -26,7 +26,7 @@ describe('learning failure handling', () => {
     let callbackCount = 0;
     let turnOffCount = 0;
 
-    learnData.start(() => { callbackCount += 1; }, () => { turnOffCount += 1; }, log, true, 2);
+    learnData.start(undefined, () => { callbackCount += 1; }, () => { turnOffCount += 1; }, log, true, 2);
     await wait(1100);
 
     expect(callbackCount).to.equal(1);
