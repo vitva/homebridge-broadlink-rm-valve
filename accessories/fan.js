@@ -248,10 +248,10 @@ class FanAccessory extends BroadlinkRMAccessory {
       }
     }
 
-    this.lastFanSpeed = closest;
-
     await this.performSend(hexData);
 
+    // Commit the cached speed only after Broadlink confirms the send succeeded.
+    this.lastFanSpeed = closest;
     this.checkAutoOnOff();
   }
 
