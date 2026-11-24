@@ -90,3 +90,33 @@ describe('RF and IR command transmission simulation', () => {
   });
 });
 
+
+describe('RF and IR transmission emulation', () => {
+  const captureTransmission = async (hexData) => {
+    const { device } = setup();
+    const transmissions = [];
+    device.sendData = (buffer, logLevel, originalHex) => {
+      transmissions.push({ bytes: buffer.toString('hex'), originalHex });
+    };
+    await sendData({ host: device.host.address, hexData, name: 'Signal test', log: () => {}, logLevel: 6 });
+    return transmissions;
+  };
+
+  it('passes a learned RF payload to the Broadlink transport unchanged', async () => {
+    const rfCode = 'b2000000000000000000000000000000';
+    expect(await captureTransmission(rfCode)).to.deep.equal([{ bytes: rfCode, originalHex: rfCode }]);
+  });
+
+  it('passes a Broadlink IR payload to the Broadlink transport unchanged', async () => {
+    const irCode = '26005000000128941213121312131213';
+    expect(await captureTransmission(irCode)).to.deep.equal([{ bytes: irCode, originalHex: irCode }]);
+  });
+
+  it('converts a Pronto IR code before handing it to the Broadlink transport', async () => {
+    const prontoCode = '0000 006D 0000 0002 0157 00AC 0015 0016';
+    const transmissions = await captureTransmission(prontoCode);
+    expect(transmissions).to.have.length(1);
+    expect(transmissions[0].originalHex).to.match(/^2600/);
+    expect(transmissions[0].bytes).to.equal(transmissions[0].originalHex);
+  });
+});
