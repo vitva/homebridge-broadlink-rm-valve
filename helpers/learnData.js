@@ -98,7 +98,7 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
   completeStart();
 
   getDataTimeout = setTimeout(() => {
-    getData(device, log);
+    getData(device, log, turnOffOnce);
   }, 1000)
 
   if (disableTimeout) {return;}
@@ -118,7 +118,7 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
   }, 10000); // 10s
 }
 
-const getData = (device, log) => {
+const getData = (device, log, turnOffOnce) => {
   if (getDataTimeout) {clearTimeout(getDataTimeout);}
   if (!closeClient) {return;}
 
@@ -127,12 +127,12 @@ const getData = (device, log) => {
   } catch (error) {
     log(`\x1b[31m[ERROR]\x1b[0m Learn Code (failed to request learned data: ${error.message || error})`);
     stop(log, device);
-    if (turnOffCallback) {turnOffOnce();}
+    if (turnOffOnce) {turnOffOnce();}
     return;
   }
 
   getDataTimeout = setTimeout(() => {
-    getData(device, log);
+    getData(device, log, turnOffOnce);
   }, 1000);
 }
 
