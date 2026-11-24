@@ -16,6 +16,24 @@ describe('learnAccessories', () => {
     expect(accessories).to.have.length(0);
   });
 
+  it('does not publish learning accessories for an unsupported-only configuration', async () => {
+    const accessories = await getAccessories({
+      isUnitTest: true,
+      accessories: [{ name: 'Unsupported accessory', type: 'not-a-real-type' }]
+    });
+
+    expect(accessories).to.have.length(0);
+  });
+
+  it('does not publish learning accessories when every configured accessory is disabled', async () => {
+    const accessories = await getAccessories({
+      isUnitTest: true,
+      accessories: [{ name: 'Disabled switch', type: 'switch', disabled: true }]
+    });
+
+    expect(accessories).to.have.length(0);
+  });
+
   it('adds the built-in learning accessories when a real accessory is configured', async () => {
     const accessories = await getAccessories({
       disableLogs: true,
