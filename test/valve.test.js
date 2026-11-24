@@ -31,12 +31,16 @@ describe('valveAccessory', () => {
     expect(device.sentHexCodes).to.deep.equal(['AABB', 'AABB', 'CCDD']);
     expect(valve.state.active).to.equal(Characteristic.Active.ACTIVE);
     expect(valve.state.inUse).to.equal(Characteristic.InUse.IN_USE);
+    expect(valve.serviceManager.service.characteristics[Characteristic.Active].value).to.equal(Characteristic.Active.ACTIVE);
+    expect(valve.serviceManager.service.characteristics[Characteristic.InUse].value).to.equal(Characteristic.InUse.IN_USE);
 
     await setActive(valve, Characteristic.Active.INACTIVE);
 
     expect(device.sentHexCodes).to.deep.equal(['AABB', 'AABB', 'CCDD', 'DDEE']);
     expect(valve.state.active).to.equal(Characteristic.Active.INACTIVE);
     expect(valve.state.inUse).to.equal(Characteristic.InUse.NOT_IN_USE);
+    expect(valve.serviceManager.service.characteristics[Characteristic.Active].value).to.equal(Characteristic.Active.INACTIVE);
+    expect(valve.serviceManager.service.characteristics[Characteristic.InUse].value).to.equal(Characteristic.InUse.NOT_IN_USE);
   });
   it('serializes concurrent multi-step open and close actions', async () => {
     const { device } = setup();
