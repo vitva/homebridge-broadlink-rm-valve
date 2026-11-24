@@ -79,8 +79,15 @@ class HumidifierDehumidifierAccessory extends FanAccessory {
     
     if (logLevel <=2) {log(`${name} setCurrentState: currently ${previousValue}, changing to ${state.currentState}`);}
 	  
-    if(hexData) {await this.performSend(hexData);}
-    serviceManager.updateCharacteristic(Characteristic.CurrentHumidifierDehumidifierState,state.currentState);
+    if (hexData) {
+      try {
+        await this.performSend(hexData);
+      } catch (error) {
+        state.currentState = previousValue;
+        throw error;
+      }
+    }
+    serviceManager.updateCharacteristic(Characteristic.CurrentHumidifierDehumidifierState, state.currentState);
     this.previouslyOff = false;
   }
   
