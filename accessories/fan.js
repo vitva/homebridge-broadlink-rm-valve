@@ -6,6 +6,10 @@ const ping = require('../helpers/ping');
 const arp = require('../helpers/arp')
 
 class FanAccessory extends BroadlinkRMAccessory {
+  getPowerCharacteristic () {
+    return Characteristic.Active;
+  }
+
   constructor(log, config = {}, serviceManagerType) {
     super(log, config, serviceManagerType);
 
@@ -64,8 +68,9 @@ class FanAccessory extends BroadlinkRMAccessory {
       this.pingGraceTimeout = null;
     }
 
-    if (this.serviceManager.getCharacteristic(Characteristic.Active) === undefined) {
-      this.serviceManager.setCharacteristic(Characteristic.Active, false);
+    const powerCharacteristic = this.getPowerCharacteristic();
+    if (this.serviceManager.getCharacteristic(powerCharacteristic) === undefined) {
+      this.serviceManager.setCharacteristic(powerCharacteristic, false);
     }
   }
 
