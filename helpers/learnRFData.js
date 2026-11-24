@@ -15,7 +15,13 @@ const stop = (log, device, logLevel) => {
 
   isClosingClient = true;
 
-  if (currentDevice) {currentDevice.cancelLearn();}
+  if (currentDevice) {
+    try {
+      currentDevice.cancelLearn();
+    } catch (error) {
+      if (log) {log(`Scan RF cancel error: ${error.message || error}`);}
+    }
+  }
 
   setTimeout(() => {
     closeClient();
@@ -77,13 +83,19 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
     log(`\x1b[35m[INFO]\x1b[0m Scan RF (found frequency - 1 of 2)`);
 
     if (device.type === 0x279d || device.type === 0x27a9) {
-      return device.enterLearning();
+      try {
+        return device.enterLearning();
+      } catch (error) {
+        log(`\x1b[31m[ERROR]\x1b[0m Scan RF (could not restart learning: ${error.message || error})`);
+        stop(log, device, logLevel);
+        return;
+      }
     }
 
     log(`\x1b[35m[ACTION]\x1b[0m Keep holding that button!`)
 
     getDataTimeout2 = setTimeout(() => {
-      getData2(device);
+      getData2(device, log, logLevel);
     }, 1000);
   };
 
@@ -97,7 +109,7 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
     log(`\x1b[35m[ACTION]\x1b[0m Press the RF button multiple times with a pause between them to get code.`);
 
     getDataTimeout3 = setTimeout(() => {
-      getData3(device);
+      getData3(device, log, logLevel);
     }, 1000);
   };
 
@@ -108,7 +120,11 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
     log(`\x1b[35m[INFO]\x1b[0m Scan RF (complete)`);
     log(`\x1b[35m[RESULT]\x1b[0m Hex Code: ${hex}`);
 
-    device.cancelLearn();
+    try {
+      device.cancelLearn();
+    } catch (error) {
+      log(`Scan RF cancel error: ${error.message || error}`);
+    }
 
     closeClient();
 
@@ -119,7 +135,15 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
   device.on('rawRFData2', onRawData2);
   device.on('rawData', onRawData3);
 
-  device.enterRFSweep();
+  try {
+    device.enterRFSweep();
+  } catch (error) {
+    log(`\x1b[31m[ERROR]\x1b[0m Scan RF (could not start scan: ${error.message || error})`);
+    closeClient();
+    closeClient = null;
+    currentDevice = null;
+    return;
+  }
   log(`\x1b[35m[INFO]\x1b[0m Scan RF (scanning)`);
   log(`\x1b[35m[ACTION]\x1b[0m Hold down the button that sends the RF frequency.`);
 
@@ -133,7 +157,11 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
 
   // Timeout the client after 60 seconds
   timeout = setTimeout(() => {
-    device.cancelLearn()
+    try {
+      device.cancelLearn();
+    } catch (error) {
+      log(`Scan RF cancel error: ${error.message || error}`);
+    }
 
     setTimeout(() => {
       log('\x1b[35m[INFO]\x1b[0m Scan RF (stopped - 60s timeout)');
@@ -144,36 +172,54 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
   }, 60 * 1000); //60s
 }
 
-const getData = (device) => {
+const getData = (device, log, logLevel) => {
   if (getDataTimeout) {clearTimeout(getDataTimeout);}
   if (!closeClient) {return;}
 
-  device.checkRFData();
+  try {
+    device.checkRFData();
+  } catch (error) {
+    log(`\x1b[31m[ERROR]\x1b[0m Scan RF (failed to request frequency data: ${error.message || error})`);
+    stop(log, device, logLevel);
+    return;
+  }
 
   getDataTimeout = setTimeout(() => {
-    getData(device);
+    getData(device, log, logLevel);
   }, 1000);
 }
 
-const getData2 = (device) => {
+const getData2 = (device, log, logLevel) => {
   if (getDataTimeout2) {clearTimeout(getDataTimeout2);}
   if (!closeClient) {return;}
 
-  device.checkRFData2();
+  try {
+    device.checkRFData2();
+  } catch (error) {
+    log(`\x1b[31m[ERROR]\x1b[0m Scan RF (failed to request second frequency data: ${error.message || error})`);
+    stop(log, device, logLevel);
+    return;
+  }
 
   getDataTimeout2 = setTimeout(() => {
-    getData2(device);
+    getData2(device, log, logLevel);
   }, 1000);
 }
 
-const getData3 = (device) => {
+const getData3 = (device, log, logLevel) => {
   if (getDataTimeout3) {clearTimeout(getDataTimeout3);}
   if (!closeClient) {return;}
 
-  device.checkData()
+  try {
+    device.checkData();
+  } catch (error) {
+    log(`\x1b[31m[ERROR]\x1b[0m Scan RF (failed to request learned code: ${error.message || error})`);
+    stop(log, device, logLevel);
+    return;
+  }
 
   getDataTimeout3 = setTimeout(() => {
-    getData3(device);
+    getData3(device, log, logLevel);
   }, 1000);
 }
 
