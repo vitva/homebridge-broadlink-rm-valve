@@ -92,7 +92,7 @@ class HomebridgeAccessory {
     callback();
   }
 
-  performSetValueAction({ host, data, log, name }) {
+  performSetValueAction({ host, data, log, name, logLevel }) {
     throw new Error('The "performSetValueAction" method must be overridden.');
   }
 
@@ -142,9 +142,9 @@ class HomebridgeAccessory {
       const data = value ? onData : offData;
 
       if (setValuePromise) {
-        setValuePromise(data, previousValue);
+        await setValuePromise(data, previousValue);
       } else if (data) {
-        this.performSetValueAction({ host, data, log, name });
+        await this.performSetValueAction({ host, data, log, name, logLevel });
       }
       callback(null);
     } catch (err) {
