@@ -3,7 +3,7 @@
   "pluginType": "platform",
   "singular": true,
   "headerDisplay": "Настройка Broadlink RM для Homebridge. Добавляйте аксессуары в список ниже. Для обучения ИК-команд используйте аксессуар **Learn**, который плагин добавляет автоматически. [Инструкция и примеры](https://github.com/vitva/homebridge-broadlink-rm-valve#readme).",
-  "footerDisplay": "**Важно:** все исходные типы аксессуаров сохранены. После выбора типа показываются относящиеся к нему параметры и команды. Для нестандартных динамических карт команд, сложных массивов повторов/пауз и температурных таблиц используйте JSON Config — формат оригинального плагина сохранён. **Кран:** отдельные команды открытия и закрытия; HomeKit показывает последнее отправленное состояние, а не подтверждённое физическое положение.",
+  "footerDisplay": "**Важно:** все исходные типы аксессуаров сохранены. После выбора типа показываются относящиеся к нему параметры и команды. Для нестандартных динамических карт команд, сложных массивов повторов/пауз и температурных таблиц используйте JSON Config — формат оригинального плагина сохранён. **Кран:** отдельные команды открытия и закрытия; HomeKit показывает последнее отправленное состояние, а не подтверждённое физическое положение. Для проверки крана без Broadlink включите «Тестовый режим (без Broadlink)»: команды будут имитироваться.",
   "schema": {
     "type": "object",
     "properties": {
@@ -761,7 +761,7 @@
               },
               "additionalProperties": true,
               "condition": {
-                "functionBody": "return !!model.accessories?.[arrayIndices]?.type;"
+                "functionBody": "const type = model.accessories?.[arrayIndices]?.type; return !!type && !(type === 'valve' && model.accessories?.[arrayIndices]?.testMode === true);"
               }
             },
             "subType": {
@@ -1517,6 +1517,15 @@
               "description": "Совместимый общий параметр; отдельные lockDuration и unlockDuration имеют приоритет.",
               "condition": {
                 "functionBody": "return [\"lock\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "testMode": {
+              "title": "Тестовый режим (без Broadlink)",
+              "type": "boolean",
+              "default": false,
+              "description": "Для проверки аксессуара в Apple Home без Broadlink RM. Команды открытия и закрытия только имитируются.",
+              "condition": {
+                "functionBody": "return model.accessories?.[arrayIndices]?.type === 'valve';"
               }
             }
           },
