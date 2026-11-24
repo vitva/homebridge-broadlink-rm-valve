@@ -32,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Validation
 - GitHub Actions passed on Node.js 22, 24, and 26.
-- 181 automated tests passed on each Node.js version; ESLint passed on all three.
+- 202 Mocha tests passed on each Node.js version; ESLint passed on all three.
 - Full and production npm audits reported zero vulnerabilities.
 - The release-candidate npm archive audit passed.
 
