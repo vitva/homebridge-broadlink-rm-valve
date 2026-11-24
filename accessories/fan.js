@@ -165,6 +165,7 @@ class FanAccessory extends BroadlinkRMAccessory {
 
   async setSwitchState(hexData, previousValue) {
     const { config, state, serviceManager } = this;
+    const previousLastFanSpeed = this.lastFanSpeed;
     if (!state.switchState) {
       this.lastFanSpeed = undefined;
     }
@@ -181,7 +182,12 @@ class FanAccessory extends BroadlinkRMAccessory {
 
     this.reset();
 
-    if (hexData) {await this.performSend(hexData);}
+    try {
+      if (hexData) {await this.performSend(hexData);}
+    } catch (error) {
+      this.lastFanSpeed = previousLastFanSpeed;
+      throw error;
+    }
   }
 
   async setFanSpeed(hexData) {
