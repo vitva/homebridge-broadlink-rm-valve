@@ -50,7 +50,7 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
     if (turnOffCallback) {turnOffCallback();}
   };
   const failSession = (error) => {
-    if (log) {log(`\\x1b[31m[ERROR]\\x1b[0m Scan RF (${error.message || error})`);}
+    if (log) {log(`\x1b[31m[ERROR]\x1b[0m Scan RF (${error.message || error})`);}
     if (currentDevice) {
       try {currentDevice.cancelLearn();} catch (cancelError) {
         if (log) {log(`Scan RF cancel error: ${cancelError.message || cancelError}`);}
@@ -234,7 +234,7 @@ const getData2 = (device, log, logLevel, failSession) => {
     device.checkRFData2();
   } catch (error) {
     log(`\x1b[31m[ERROR]\x1b[0m Scan RF (failed to request second frequency data: ${error.message || error})`);
-    stop(log, device, logLevel);
+    failSession(error);
     return;
   }
 
