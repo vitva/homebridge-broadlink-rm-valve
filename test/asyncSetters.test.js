@@ -41,6 +41,7 @@ describe('asynchronous HomeKit setters', () => {
 
   it('passes asynchronous action failures back through the HomeKit callback', async () => {
     const accessory = makeAccessory();
+    accessory.state.switchState = false;
     const failure = new Error('simulated Broadlink send failure');
     const result = await new Promise(resolve => {
       accessory.setCharacteristicValue({
@@ -52,6 +53,7 @@ describe('asynchronous HomeKit setters', () => {
     });
 
     expect(result).to.equal(failure);
+    expect(accessory.state.switchState).to.equal(false);
   });
 
   it('waits for the default Broadlink send action before acknowledging the HomeKit write', async () => {
