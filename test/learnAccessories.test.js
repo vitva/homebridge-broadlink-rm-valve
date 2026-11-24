@@ -44,6 +44,19 @@ describe('learnAccessories', () => {
     expect(accessories).to.have.length(3);
   });
 
+  it('adds built-in learning accessories when the configured learning accessory is disabled', async () => {
+    const accessories = await getAccessories({
+      disableLogs: true,
+      isUnitTest: true,
+      accessories: [
+        configuredSwitch,
+        { name: 'Disabled Learn Code', type: 'learn-code', disabled: true }
+      ]
+    });
+
+    expect(accessories).to.have.length(3);
+  });
+
   it('respects hideScanFrequencyButton when accessories are configured', async () => {
     const accessories = await getAccessories({
       disableLogs: true,
