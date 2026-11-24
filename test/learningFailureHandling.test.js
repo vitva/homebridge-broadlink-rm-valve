@@ -50,6 +50,21 @@ describe('learning failure handling', () => {
     expect(device.listenerCount('rawData')).to.equal(0);
   });
 
+  it('turns off RF scanning when a device fails to re-enter IR learning', () => {
+    const { device } = setup();
+    device.type = 0x279d;
+    device.learningError = new Error('RF-to-IR transition failed');
+    let turnOffCount = 0;
+
+    learnRFData.start(undefined, () => {}, () => { turnOffCount += 1; }, log, true, 2);
+    device.emit('rawRFData', Buffer.from('frequency'));
+
+    expect(turnOffCount).to.equal(1);
+    expect(device.listenerCount('rawRFData')).to.equal(0);
+    expect(device.listenerCount('rawRFData2')).to.equal(0);
+    expect(device.listenerCount('rawData')).to.equal(0);
+  });
+
   it('turns off RF scanning when the first polling stage fails', async () => {
     const { device } = setup();
     device.checkRFDataError = new Error('RF frequency polling failed');
