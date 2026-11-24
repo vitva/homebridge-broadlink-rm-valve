@@ -1,5 +1,6 @@
 const { expect } = require('chai');
-const { log, setup } = require('./helpers/setup');
+const delayForDuration = require('../helpers/delayForDuration');
+const { setup } = require('./helpers/setup');
 const { AirPurifier } = require('../accessories');
 
 describe('air purifier HomeKit characteristics', () => {
@@ -43,7 +44,8 @@ describe('air purifier HomeKit characteristics', () => {
       }
     }, 'FakeServiceManager');
 
-    await purifier.serviceManager.setCharacteristic(Characteristic.Active, true);
+    purifier.serviceManager.setCharacteristic(Characteristic.Active, true);
+    await delayForDuration(0.05);
     expect(device.hasSentCode('ON')).to.equal(true);
     expect(purifier.state.currentState).to.equal(Characteristic.CurrentAirPurifierState.PURIFYING_AIR);
   });
