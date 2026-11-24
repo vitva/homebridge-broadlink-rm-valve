@@ -3,11 +3,6 @@ const { expect } = require('chai');
 const AirConAccessory = require('../accessories/aircon');
 const HumidifierDehumidifierAccessory = require('../accessories/humidifier-dehumidifier');
 
-const readWith = (accessory, method, resultHandler) => new Promise((resolve, reject) => {
-  accessory[method]();
-  resultHandler(resolve, reject);
-});
-
 describe('file-backed sensor error handling', () => {
   it('uses the last temperature and humidity when a configured temperature file is missing', async () => {
     const accessory = Object.create(AirConAccessory.prototype);
