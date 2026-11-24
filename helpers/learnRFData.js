@@ -251,7 +251,7 @@ const getData3 = (device, log, logLevel, failSession) => {
     device.checkData();
   } catch (error) {
     log(`\x1b[31m[ERROR]\x1b[0m Scan RF (failed to request learned code: ${error.message || error})`);
-    stop(log, device, logLevel);
+    failSession(error);
     return;
   }
 
