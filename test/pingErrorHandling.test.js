@@ -16,6 +16,7 @@ describe('Broadlink ping error handling', () => {
     let callbackPromise;
 
     ping.sys.probe = (address, callback) => {
+      expect(address).to.equal(device.host.address);
       callbackPromise = new Promise((resolve, reject) => {
         setImmediate(() => {
           try {
