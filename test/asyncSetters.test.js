@@ -67,6 +67,7 @@ describe('asynchronous HomeKit setters', () => {
     accessory.log = () => {};
     accessory.logLevel = 2;
     accessory.name = 'Async humidifier test';
+    accessory.data = { targetStateDehumidifier: 'DEHUMIDIFY' };
     accessory.state = { currentState: requestedState, switchState: true };
     accessory.serviceManager = { updateCharacteristic: () => {} };
     accessory.performSend = async () => { throw failure; };
