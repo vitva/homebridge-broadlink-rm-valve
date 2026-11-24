@@ -39,3 +39,54 @@ describe('fake service manager wiring', () => {
     expect(accessory.state.switchState).to.equal(true);
   });
 });
+
+describe('Broadlink device routing', () => {
+  it('selects a discovered device by either its IP address or normalized MAC address', () => {
+    const { device } = setup();
+    expect(getDevice({ host: device.host.address })).to.equal(device);
+    expect(getDevice({ host: device.host.macAddress })).to.equal(device);
+  });
+
+  it('uses the first discovered device when no accessory host is configured', () => {
+    const { device: first } = setup();
+    const FakeDevice = require('./fakeDevice');
+    const { addDevice } = require('../../helpers/getDevice');
+    const second = new FakeDevice();
+    addDevice(second);
+
+    expect(getDevice({})).to.equal(first);
+    expect(getDevice({ host: second.host.address })).to.equal(second);
+    expect(getDevice({ host: second.host.macAddress })).to.equal(second);
+  });
+});
+describe('RF and IR command transmission simulation', () => {
+  it('passes a learned RF HEX command to the Broadlink device transport', async () => {
+    const { device } = setup();
+
+    await sendData({
+      host: device.host.address,
+      hexData: 'B2A1C3D4',
+      log: () => {},
+      name: 'RF test',
+      logLevel: 6
+    });
+
+    expect(device.hasSentCode('B2A1C3D4')).to.equal(true);
+  });
+
+  it('converts an IR Pronto command and passes the Broadlink HEX packet to the device transport', async () => {
+    const { device } = setup();
+
+    await sendData({
+      host: device.host.address,
+      hexData: '0000 006D 0000 0001 0010 0020',
+      log: () => {},
+      name: 'IR test',
+      logLevel: 6
+    });
+
+    expect(device.sentHexCodes).to.have.length(1);
+    expect(device.sentHexCodes[0]).to.match(/^2600[0-9a-f]+$/i);
+  });
+});
+
