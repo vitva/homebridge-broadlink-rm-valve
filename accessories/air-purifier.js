@@ -71,7 +71,8 @@ class AirPurifierAccessory extends FanAccessory {
       name: 'currentState',
       type: Characteristic.CurrentAirPurifierState,
       method: this.getCharacteristicValue,
-      bind: this
+      bind: this,
+      props: {}
     });
 
     this.serviceManager.addToggleCharacteristic({
