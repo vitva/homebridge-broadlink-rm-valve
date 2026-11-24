@@ -16,6 +16,13 @@ fi
 echo "Auditing exact published npm artifact: ${PACKAGE}@${VERSION}"
 echo "Comparing against Git tag: ${TAG}"
 
+# Pull-request checks must not wait for a version that has not been published yet.
+# Release-triggered audits keep the retry loop below to allow npm propagation.
+if [[ "${GITHUB_EVENT_NAME:-}" == "pull_request" ]] && ! npm view "${PACKAGE}@${VERSION}" version >/dev/null 2>&1; then
+  echo "SKIP: ${PACKAGE}@${VERSION} is not published yet; release audit will run after publication."
+  exit 0
+fi
+
 # npm accepts a publish before the version's metadata and tarball are fully
 # propagated. Poll the exact version instead of failing the release audit on
 # the first transient 404.

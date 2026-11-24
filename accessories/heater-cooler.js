@@ -518,6 +518,13 @@ class HeaterCoolerAccessory extends BroadlinkRMAccessory {
    */
   async monitorTemperature() {
     const { config, host, log, logLevel, name, state } = this;
+
+    if (this.testMode) {
+      if (state.currentTemperature === undefined) {state.currentTemperature = 20;}
+      if (state.currentHumidity === undefined && !config.noHumidity) {state.currentHumidity = 50;}
+      this.updateTemperatureUI();
+      return;
+    }
     const { temperatureFilePath, defaultNowTemperature, w1DeviceID } = config;
 
     if (defaultNowTemperature !== undefined) {return;}

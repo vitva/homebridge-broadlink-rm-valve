@@ -186,6 +186,12 @@ class HumidifierDehumidifierAccessory extends FanAccessory {
   // Device Temperature Methods
   async monitorHumidity () {
     const { logLevel, config, host, log, name, state } = this;
+
+    if (this.testMode) {
+      if (state.currentHumidity === undefined) {state.currentHumidity = 50;}
+      this.updateHumidityUI();
+      return;
+    }
     const device = getDevice({ host, log });
 	  
     // Try again in a second if we don't have a device yet
@@ -243,6 +249,11 @@ class HumidifierDehumidifierAccessory extends FanAccessory {
     // Add a new callback
     const callbackIdentifier = uuid.v4();
     this.humidityCallbackQueue[callbackIdentifier] = callback;
+
+    if (this.testMode) {
+      this.processQueuedHumidityCallbacks(state.currentHumidity === undefined ? 50 : state.currentHumidity);
+      return;
+    }
     
     // Read temperature from file
     if (config.humidityFilePath) {

@@ -411,6 +411,13 @@ class AirConAccessory extends BroadlinkRMAccessory {
 
   async monitorTemperature () {
     const { config, host, log, logLevel, name, state } = this;
+
+    if (this.testMode) {
+      if (state.currentTemperature === undefined) {state.currentTemperature = 20;}
+      if (state.currentHumidity === undefined && !config.noHumidity) {state.currentHumidity = 50;}
+      this.updateTemperatureUI();
+      return;
+    }
     const { temperatureFilePath, pseudoDeviceTemperature, w1DeviceID, mqttURL } = config;
 
     if (pseudoDeviceTemperature !== undefined) {return;}
@@ -494,6 +501,11 @@ class AirConAccessory extends BroadlinkRMAccessory {
     // Add a new callback
     const callbackIdentifier = uuid.v4();
     this.temperatureCallbackQueue[callbackIdentifier] = callback;
+
+    if (this.testMode) {
+      this.processQueuedTemperatureCallbacks(state.currentTemperature === undefined ? 20 : state.currentTemperature);
+      return;
+    }
 
     // Read temperature from file
     if (temperatureFilePath) {

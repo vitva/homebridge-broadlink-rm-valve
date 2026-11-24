@@ -363,4 +363,23 @@ describe('switchAccessory', () => {
     const sentHexCodeCount = device.getSentHexCodeCount();
     expect(sentHexCodeCount).to.equal(0);
   });
+
+  // Test mode should update HomeKit state without sending Broadlink commands.
+  it('simulates a switch action without a Broadlink device when testMode is enabled', () => {
+    const { device } = setup();
+    const switchAccessory = new Switch(null, {
+      data,
+      name: 'Virtual test switch',
+      testMode: true,
+      persistState: false,
+      host: device.host.address
+    }, 'FakeServiceManager');
+
+    require('../helpers/getDevice').resetDevices();
+    switchAccessory.serviceManager.setCharacteristic(Characteristic.On, true);
+
+    expect(switchAccessory.state.switchState).to.equal(true);
+    expect(device.getSentHexCodeCount()).to.equal(0);
+  });
+
 })

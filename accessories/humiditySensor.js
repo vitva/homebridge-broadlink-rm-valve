@@ -33,6 +33,12 @@ class HumiditySensorAccessory extends HumidifierAccessory {
   async monitorHumidity () {
     const { config, host, log, logLevel, name, state } = this;
 
+    if (this.testMode) {
+      if (state.currentHumidity === undefined) {state.currentHumidity = 50;}
+      this.updateHumidityUI();
+      return;
+    }
+
     const device = getDevice({ host, log });
 
     // Try again in a second if we don't have a device yet
