@@ -8,6 +8,7 @@ const configSchema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
 assert.equal(configSchema.pluginAlias, 'BroadlinkRM');
 assert.equal(configSchema.pluginType, 'platform');
 assert.equal(configSchema.singular, true);
+assert.equal(Object.hasOwn(configSchema, 'form'), false, 'Use the current Config UI schema-driven layout; legacy form layout hid the accessory array');
 
 const platformProperties = configSchema.schema.properties;
 assert.ok(platformProperties.name);
@@ -20,7 +21,7 @@ assert.equal(accessoryArray.items.type, 'object');
 assert.equal(accessoryArray.items.additionalProperties, true, 'Accessory items must allow legacy config keys');
 assert.equal(Object.hasOwn(accessoryArray.items.properties, 'additionalProperties'), false, 'additionalProperties must not be declared as an accessory field');
 assert.equal(Object.hasOwn(accessoryArray.items.properties.data.properties, 'additionalProperties'), false, 'additionalProperties must not be declared as a Broadlink command field');
-assert.equal(Object.hasOwn(accessoryArray, 'title'), false, 'The fieldset supplies the single Accessories heading');
+assert.equal(accessoryArray.title, 'Аксессуары HomeKit', 'The generated schema form must label the accessory array');
 const accessoryProperties = accessoryArray.items.properties;
 const supportedTypes = accessoryProperties.type.oneOf.map(option => option.enum[0]);
 const expectedTypes = [
