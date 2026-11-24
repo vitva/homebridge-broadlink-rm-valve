@@ -84,7 +84,7 @@ class Fanv1Accessory extends FanAccessory {
         setValuePromise: this.setFanSpeed.bind(this),
 		    minStep: config.stepSize,
 		    minValue: 0,
-		    maxVlue: 100
+		    maxValue: 100
       }
     });
 
