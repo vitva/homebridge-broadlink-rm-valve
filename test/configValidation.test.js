@@ -18,6 +18,23 @@ describe('accessory configuration validation', () => {
       .to.throw('must be a number');
   });
 
+  it('logs and skips an accessory with invalid config instead of rejecting platform startup', async () => {
+    const { getAccessories } = require('./helpers/setup');
+    const accessories = await getAccessories({
+      isUnitTest: true,
+      accessories: [{
+        name: 'Invalid switch',
+        type: 'switch',
+        enabled: 'true',
+        data: { on: 'ON', off: 'OFF' },
+        persistState: false
+      }]
+    });
+
+    // The invalid accessory is skipped; the built-in learning accessories remain available.
+    expect(accessories).to.have.length(2);
+  });
+
   it('safely ignores null values and accepts native JSON values', () => {
     expect(() => accessory.checkConfig({
       optional: null,
