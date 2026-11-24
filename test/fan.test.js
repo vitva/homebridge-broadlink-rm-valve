@@ -456,3 +456,37 @@ describe('fanAccessory', () => {
     expect(sentHexCodeCount).to.equal(0);
   });
 })
+
+const { Fanv1 } = require('../accessories');
+
+describe('fanv1Accessory HomeKit compatibility', () => {
+  it('uses the legacy On characteristic for power and automatic state changes', async () => {
+    const { device } = setup();
+    const fan = new Fanv1(null, {
+      ...defaultConfig,
+      host: device.host.address,
+      enableAutoOn: false,
+      enableAutoOff: false
+    }, 'FakeServiceManager');
+
+    await fan.serviceManager.setCharacteristic(Characteristic.On, true);
+    expect(fan.state.switchState).to.equal(true);
+    expect(device.hasSentCode('ON')).to.equal(true);
+
+    await fan.serviceManager.setCharacteristic(Characteristic.On, false);
+    expect(fan.state.switchState).to.equal(false);
+    expect(device.hasSentCode('OFF')).to.equal(true);
+  });
+
+  it('uses a valid maxValue property for the legacy fan speed characteristic', () => {
+    const { device } = setup();
+    const fan = new Fanv1(null, {
+      ...defaultConfig,
+      host: device.host.address
+    }, 'FakeServiceManager');
+
+    const speed = fan.serviceManager.getCharacteristic(Characteristic.RotationSpeed);
+    expect(speed.props.maxValue).to.equal(100);
+    expect(speed.props.maxVlue).to.equal(undefined);
+  });
+});
