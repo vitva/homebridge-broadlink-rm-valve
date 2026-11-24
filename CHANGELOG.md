@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Keep the platform idle until at least one enabled accessory is configured; do not publish automatic learning accessories for an empty configuration.
 - Handle asynchronous Broadlink ping errors without throwing from the probe callback.
+- Catch malformed platform and accessory configuration errors, log them, and skip invalid accessories without aborting platform startup.
 - Use the correct numeric HomeKit Active values for Fan v2 and TV while retaining the Boolean On characteristic for Fan v1.
 
 ### Tests
