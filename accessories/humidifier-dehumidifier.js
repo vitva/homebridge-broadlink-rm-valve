@@ -62,7 +62,9 @@ class HumidifierDehumidifierAccessory extends FanAccessory {
     } catch (error) {
       this.previouslyOff = previousPreviouslyOff;
       this.state.currentState = previousCurrentState;
-      this.serviceManager.updateCharacteristic(Characteristic.CurrentHumidifierDehumidifierState, previousCurrentState);
+      if (previousCurrentState !== undefined) {
+        this.serviceManager.updateCharacteristic(Characteristic.CurrentHumidifierDehumidifierState, previousCurrentState);
+      }
       throw error;
     }
   }
