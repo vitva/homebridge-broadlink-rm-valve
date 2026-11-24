@@ -8,6 +8,10 @@ class Fanv1Accessory extends FanAccessory {
     return Characteristic.On;
   }
 
+  getPowerCharacteristicValue (active) {
+    return Boolean(active);
+  }
+
   setDefaults () {
     super.setDefaults();
     const { config, state } = this;
