@@ -1524,35 +1524,5 @@
         }
       }
     }
-  },
-  "form": [
-    {
-      "key": "name"
-    },
-    {
-      "type": "fieldset",
-      "title": "Обнаружение Broadlink",
-      "items": [
-        "deviceDiscoveryTimeout",
-        "hosts"
-      ]
-    },
-    {
-      "type": "fieldset",
-      "title": "Аксессуары HomeKit",
-      "items": [
-        "accessories"
-      ]
-    },
-    {
-      "type": "fieldset",
-      "title": "Общие параметры",
-      "items": [
-        "logLevel",
-        "hideLearnButton",
-        "hideScanFrequencyButton",
-        "hideWelcomeMessage"
-      ]
-    }
-  ]
+  }
 }
