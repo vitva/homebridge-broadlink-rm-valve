@@ -36,16 +36,32 @@ describe('Homebridge plugin runtime registration', () => {
         testMode: true,
         persistState: false,
         data: { on: 'ON', off: 'OFF' }
+      }, {
+        name: 'Runtime smoke valve',
+        type: 'valve',
+        testMode: true,
+        persistState: false,
+        data: { open: 'OPEN', close: 'CLOSE' }
       }]
-    });
+    }););
 
     const accessories = await new Promise((resolve, reject) => {
       platform.accessories(resolve).catch(reject);
     });
 
-    expect(accessories).to.have.length(1);
-    const services = accessories[0].getServices();
-    expect(services).to.have.length.greaterThan(0);
-    expect(services.some(service => service.UUID === hap.Service.Switch.UUID)).to.equal(true);
+    expect(accessories).to.have.length(2);
+    const switchAccessory = accessories.find(accessory => accessory.name === 'Runtime smoke switch');
+    const valveAccessory = accessories.find(accessory => accessory.name === 'Runtime smoke valve');
+
+    expect(switchAccessory.getServices().some(service => service.UUID === hap.Service.Switch.UUID)).to.equal(true);
+    expect(valveAccessory.getServices().some(service => service.UUID === hap.Service.Valve.UUID)).to.equal(true);
+
+    const active = valveAccessory.serviceManager.getCharacteristic(hap.Characteristic.Active);
+    await new Promise((resolve, reject) => {
+      active.setValue(hap.Characteristic.Active.ACTIVE, error => error ? reject(error) : resolve());
+    });
+    expect(active.value).to.equal(hap.Characteristic.Active.ACTIVE);
+    expect(valveAccessory.serviceManager.getCharacteristic(hap.Characteristic.InUse).value)
+      .to.equal(hap.Characteristic.InUse.IN_USE);
   });
 });
