@@ -7,6 +7,7 @@ const checkForUpdates = require('./helpers/checkForUpdates');
 const broadlink = require('./helpers/broadlink');
 const { discoverDevices } = require('./helpers/getDevice');
 const { createAccessory } = require('./helpers/accessoryCreator');
+const { filterConfiguredAccessories, filterConfiguredHosts } = require('./helpers/filterConfiguration');
 
 const classTypes = {
   'air-conditioner': Accessory.AirCon,
@@ -51,24 +52,7 @@ const BroadlinkRMPlatform = class extends HomebridgePlatform {
     }
 
     if (config.accessories === undefined) {config.accessories = [];}
-    assert.isArray(config.accessories, `\x1b[31m[CONFIG ERROR] \x1b[33maccessories\x1b[0m should be an array of objects.`);
-
-    // Ignore empty placeholder rows created by the Homebridge Config UI.
-    // Partially configured entries that have a name, data, or host still fail
-    // validation below when their required accessory type is missing.
-    const configuredAccessories = config.accessories.filter((accessory) => {
-      if (!accessory || typeof accessory !== 'object' || Array.isArray(accessory)) {
-        if (logLevel <= 3) {log(`\x1b[33m[CONFIG WARNING]\x1b[0m Ignoring an empty or invalid accessory row.`);}
-        return false;
-      }
-
-      if (!accessory.type && !accessory.name && !accessory.data && !accessory.host) {
-        if (logLevel <= 3) {log(`\x1b[33m[CONFIG WARNING]\x1b[0m Ignoring an empty accessory placeholder from the Homebridge Config UI.`);}
-        return false;
-      }
-
-      return true;
-    });
+    const configuredAccessories = filterConfiguredAccessories(config.accessories, log, logLevel);
 
     // Add a Learn Code accessory if none exist in the config
     const learnIRAccessories = configuredAccessories.filter((accessory) => (accessory.type === 'learn-ir' || accessory.type === 'learn-code'));
@@ -134,15 +118,7 @@ const BroadlinkRMPlatform = class extends HomebridgePlatform {
       return;
     }
 
-    if (hosts !== undefined) {
-      assert.isArray(hosts, `\x1b[31m[CONFIG ERROR] \x1b[0m hosts should be an array of objects.`);
-    }
-
-    // Ignore blank Config UI host rows. Only a row with an address or MAC
-    // represents a manually configured Broadlink device.
-    const configuredHosts = (hosts || []).filter((host) =>
-      host && typeof host === 'object' && !Array.isArray(host) && (host.address || host.mac)
-    );
+    const configuredHosts = filterConfiguredHosts(hosts, log, logLevel);
 
     if (configuredHosts.length === 0) {
       if (hosts && hosts.length > 0 && logLevel <= 3) {
