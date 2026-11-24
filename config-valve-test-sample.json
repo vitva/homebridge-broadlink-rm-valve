@@ -1,0 +1,14 @@
+{
+  "platform": "BroadlinkRM",
+  "name": "Broadlink RM",
+  "hideLearnButton": true,
+  "hideScanFrequencyButton": true,
+  "accessories": [
+    {
+      "name": "Virtual test valve",
+      "type": "valve",
+      "testMode": true,
+      "persistState": false
+    }
+  ]
+}
