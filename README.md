@@ -28,7 +28,7 @@ Requires Node.js 22.12 or newer (22, 24, or 26) and Homebridge 2.x.
 
 The plugin includes a native Homebridge Config UI form. After installation, open **Plugins → Homebridge Broadlink RM Pro + Valve → Settings** to configure the platform, discover or manually enter RM devices, and add accessories without editing the main JSON configuration.
 
-For a valve, choose **Кран (Valve)** and enter two separate learned commands in **Команды Broadlink**:
+For a valve, choose **Кран (Valve)** and enter two separate learned commands in **Команды Broadlink**. To verify the HomeKit accessory without an RM device, enable **Тестовый режим (без Broadlink)**; the plugin will simulate open/close actions and will not transmit anything:
 - **Открыть (HEX)** — command that opens the valve
 - **Закрыть (HEX)** — command that closes the valve
 
@@ -82,3 +82,18 @@ MQTT connections using TLS verify the broker certificate by default. If your bro
 ```
 
 Only enable `mqttAllowInsecureTLS` when you understand the risk. It disables TLS certificate validation and can expose MQTT credentials and messages to interception. The default is `false`.
+
+## Valve test mode (no Broadlink hardware)
+
+To add a virtual valve for testing Apple Home, configure it with `testMode: true`. Do not add HEX commands or a Broadlink host in this mode:
+
+```json
+{
+  "name": "Virtual test valve",
+  "type": "valve",
+  "testMode": true,
+  "persistState": false
+}
+```
+
+After saving and restarting Homebridge, the valve should appear as a HomeKit Valve accessory. Open and Close actions only update the simulated HomeKit state; no Broadlink commands are sent. Turn test mode off and configure separate `data.open` and `data.close` commands before controlling a real valve.
