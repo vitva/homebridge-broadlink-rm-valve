@@ -20,6 +20,19 @@ describe('learning failure handling', () => {
     expect(device.listenerCount('rawData')).to.equal(0);
   });
 
+  it('replaces an active IR learning session without throwing or leaking listeners', () => {
+    const { device } = setup();
+
+    learnData.start(undefined, () => {}, () => {}, log, true, 2);
+    expect(device.listenerCount('rawData')).to.equal(1);
+
+    learnData.start(undefined, () => {}, () => {}, log, true, 2);
+    expect(device.listenerCount('rawData')).to.equal(1);
+
+    learnData.stop(log);
+    expect(device.listenerCount('rawData')).to.equal(0);
+  });
+
   it('turns off IR learning when polling fails after startup', async () => {
     const { device } = setup();
     device.checkDataError = new Error('IR polling failed');
