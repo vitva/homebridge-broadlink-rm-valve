@@ -70,7 +70,7 @@ class ValveAccessory extends BroadlinkRMAccessory {
     }
 
     const isActive = value === Characteristic.Active.ACTIVE;
-    const command = isActive ? this.data?.open : this.data?.close;
+    const command = isActive ? (this.data && this.data.open) : (this.data && this.data.close);
 
     const operation = this.commandQueue.then(async () => {
       if (this.testMode) {
