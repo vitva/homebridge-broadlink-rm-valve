@@ -53,6 +53,10 @@ assert.deepEqual(supportedTypes, expectedTypes, 'The original accessory type ord
 assert.ok(accessoryProperties.data.properties.open);
 assert.ok(accessoryProperties.data.properties.close);
 assert.ok(accessoryProperties.valveType);
+assert.ok(accessoryProperties.testMode);
+assert.equal(accessoryProperties.testMode.type, 'boolean');
+assert.ok(accessoryProperties.testMode.condition);
+assert.ok(accessoryProperties.data.condition.functionBody.includes('testMode'));
 assert.ok(accessoryProperties.valveType.condition);
 assert.ok(accessoryProperties.data.condition);
 assert.ok(accessoryProperties.data.properties.open.condition);
