@@ -123,7 +123,7 @@ describe('asynchronous HomeKit setters', () => {
         off: 'OFF',
         inputs: [{ name: 'HDMI', data: 'HDMI' }]
       }
-    }, 'FakeServiceManager');
+    }, 'ServiceManager');
     let resolveSend;
     let callbackCalled = false;
     tv.performSend = () => new Promise(resolve => { resolveSend = resolve; });
@@ -156,7 +156,7 @@ describe('asynchronous HomeKit setters', () => {
         off: 'OFF',
         inputs: [{ name: 'HDMI', data: 'HDMI' }]
       }
-    }, 'FakeServiceManager');
+    }, 'ServiceManager');
     const failure = new Error('simulated TV command failure');
     tv.state.input = 2;
     tv.performSend = async () => { throw failure; };
