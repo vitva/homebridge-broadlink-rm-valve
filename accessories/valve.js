@@ -22,11 +22,12 @@ class ValveAccessory extends BroadlinkRMAccessory {
 
   setupServiceManager () {
     const { data, name, serviceManagerType, config } = this;
+    this.testMode = config.testMode === true;
     // Keep multi-step open/close sequences atomic relative to other valve actions.
     this.commandQueue = Promise.resolve();
     const { open, close } = data || {};
 
-    if (!isValidCommand(open) || !isValidCommand(close)) {
+    if (!this.testMode && (!isValidCommand(open) || !isValidCommand(close))) {
       throw new Error(`Valve "${name}" requires valid data.open and data.close commands (hex strings or command arrays).`);
     }
 
@@ -69,15 +70,19 @@ class ValveAccessory extends BroadlinkRMAccessory {
     }
 
     const isActive = value === Characteristic.Active.ACTIVE;
-    const command = isActive ? this.data.open : this.data.close;
+    const command = isActive ? (this.data && this.data.open) : (this.data && this.data.close);
 
     const operation = this.commandQueue.then(async () => {
-      const device = getDevice({ host: this.host, log: this.log });
-      if (!device || typeof device.sendData !== 'function') {
-        throw new Error(`Valve "${this.name}" cannot send the command: no ready Broadlink RM device is available.`);
-      }
+      if (this.testMode) {
+        this.log(`Valve "${this.name}" test mode: simulated ${isActive ? 'open' : 'close'} action (no Broadlink command sent).`);
+      } else {
+        const device = getDevice({ host: this.host, log: this.log });
+        if (!device || typeof device.sendData !== 'function') {
+          throw new Error(`Valve "${this.name}" cannot send the command: no ready Broadlink RM device is available.`);
+        }
 
-      await this.performSend(command);
+        await this.performSend(command);
+      }
       this.state.active = isActive ? Characteristic.Active.ACTIVE : Characteristic.Active.INACTIVE;
       this.state.inUse = isActive ? Characteristic.InUse.IN_USE : Characteristic.InUse.NOT_IN_USE;
       this.serviceManager.updateCharacteristic(Characteristic.InUse, this.state.inUse);
