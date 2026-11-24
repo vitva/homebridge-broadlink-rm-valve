@@ -150,7 +150,7 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
   if (callback) {callback();}
 
   getDataTimeout = setTimeout(() => {
-    getData(device);
+    getData(device, log, logLevel);
   }, 1000);
 
   if (disableTimeout) {return;}
