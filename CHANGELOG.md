@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Wait for HomeKit setter actions and Broadlink sends to finish before acknowledging writes; return command failures through the HomeKit callback.
 - Catch temperature monitor failures and await retry chains instead of leaving rejected promises unhandled.
 - Catch Broadlink discovery, device registration, and synchronous update-check errors in their asynchronous callbacks.
+- Catch failures while requesting IR/RF learning data and stop the learning session cleanly instead of throwing from timer or device-event callbacks.
 - Use the correct numeric HomeKit Active values for Fan v2 and TV while retaining the Boolean On characteristic for Fan v1.
 
 ### Tests
