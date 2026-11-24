@@ -1,6 +1,8 @@
 const { expect } = require('chai');
 
 const HomebridgeAccessory = require('../base/accessory');
+const { TV } = require('../accessories');
+const { log, setup } = require('./helpers/setup');
 
 const makeAccessory = () => {
   const accessory = Object.create(HomebridgeAccessory.prototype);
@@ -54,6 +56,62 @@ describe('asynchronous HomeKit setters', () => {
 
     expect(result).to.equal(failure);
     expect(accessory.state.switchState).to.equal(false);
+  });
+
+  it('waits for TV input commands before acknowledging the HomeKit write', async () => {
+    const { device } = setup();
+    const tv = new TV(log, {
+      host: device.host.address,
+      isUnitTest: true,
+      persistState: false,
+      data: {
+        on: 'ON',
+        off: 'OFF',
+        inputs: [{ name: 'HDMI', data: 'HDMI' }]
+      }
+    }, 'FakeServiceManager');
+    let resolveSend;
+    let callbackCalled = false;
+    tv.performSend = () => new Promise(resolve => { resolveSend = resolve; });
+
+    const input = tv.serviceManager.getCharacteristic(Characteristic.ActiveIdentifier);
+    const callbackPromise = new Promise(resolve => {
+      input.setMethod(0, error => {
+        callbackCalled = true;
+        resolve(error || null);
+      });
+    });
+
+    await Promise.resolve();
+    expect(resolveSend).to.be.a('function');
+    expect(callbackCalled).to.equal(false);
+
+    resolveSend();
+    expect(await callbackPromise).to.equal(null);
+    expect(tv.state.input).to.equal(0);
+  });
+
+  it('returns TV command failures through HomeKit and rolls back the selected input', async () => {
+    const { device } = setup();
+    const tv = new TV(log, {
+      host: device.host.address,
+      isUnitTest: true,
+      persistState: false,
+      data: {
+        on: 'ON',
+        off: 'OFF',
+        inputs: [{ name: 'HDMI', data: 'HDMI' }]
+      }
+    }, 'FakeServiceManager');
+    const failure = new Error('simulated TV command failure');
+    tv.state.input = 2;
+    tv.performSend = async () => { throw failure; };
+
+    const input = tv.serviceManager.getCharacteristic(Characteristic.ActiveIdentifier);
+    const result = await new Promise(resolve => input.setMethod(0, resolve));
+
+    expect(result).to.equal(failure);
+    expect(tv.state.input).to.equal(2);
   });
 
   it('waits for the default Broadlink send action before acknowledging the HomeKit write', async () => {
