@@ -85,6 +85,8 @@ class ValveAccessory extends BroadlinkRMAccessory {
       }
       this.state.active = isActive ? Characteristic.Active.ACTIVE : Characteristic.Active.INACTIVE;
       this.state.inUse = isActive ? Characteristic.InUse.IN_USE : Characteristic.InUse.NOT_IN_USE;
+      // Explicitly publish both Valve state characteristics to HomeKit.
+      this.serviceManager.updateCharacteristic(Characteristic.Active, this.state.active);
       this.serviceManager.updateCharacteristic(Characteristic.InUse, this.state.inUse);
     });
 
