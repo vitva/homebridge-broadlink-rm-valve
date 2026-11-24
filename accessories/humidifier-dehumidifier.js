@@ -50,11 +50,21 @@ class HumidifierDehumidifierAccessory extends FanAccessory {
     super.reset();
   }
   
-  async setSwitchState (hexData, previousValue){
-    this.previouslyOff = previousValue ? false : true;
-    await this.updateDeviceState();
-    await super.setSwitchState(hexData, previousValue);
-    super.checkAutoOnOff();
+  async setSwitchState (hexData, previousValue) {
+    const previousCurrentState = this.state.currentState;
+    const previousPreviouslyOff = this.previouslyOff;
+
+    try {
+      this.previouslyOff = previousValue ? false : true;
+      await this.updateDeviceState();
+      await super.setSwitchState(hexData, previousValue);
+      super.checkAutoOnOff();
+    } catch (error) {
+      this.previouslyOff = previousPreviouslyOff;
+      this.state.currentState = previousCurrentState;
+      this.serviceManager.updateCharacteristic(Characteristic.CurrentHumidifierDehumidifierState, previousCurrentState);
+      throw error;
+    }
   }
   
   async setCurrentState (hexData, previousValue) {
