@@ -116,7 +116,6 @@
         }
       },
       "accessories": {
-        "title": "Аксессуары HomeKit",
         "type": "array",
         "description": "Добавьте аксессуар, выберите его тип и укажите команды Broadlink.",
         "items": {
@@ -1473,7 +1472,6 @@
                 "functionBody": "return [\"heater-cooler\"].includes(model.accessories?.[arrayIndices]?.type);"
               }
             },
-            "additionalProperties": true,
             "autoCoolTemperature": {
               "title": "Порог автоматического охлаждения",
               "type": "number",
@@ -1522,7 +1520,8 @@
                 "functionBody": "return [\"lock\"].includes(model.accessories?.[arrayIndices]?.type);"
               }
             }
-          }
+          },
+          "additionalProperties": true
         }
       }
     }
