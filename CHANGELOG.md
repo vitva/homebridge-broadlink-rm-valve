@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Keep the platform idle until at least one enabled accessory is configured; do not publish automatic learning accessories for an empty configuration.
 - Handle asynchronous Broadlink ping errors without throwing from the probe callback.
 - Catch malformed platform and accessory configuration errors, log them, and skip invalid accessories without aborting platform startup.
+- Fall back to the last sensor reading when temperature, humidity, or 1-Wire source files cannot be read; avoid exceptions in asynchronous file callbacks.
+- Await humidifier state transitions and Broadlink power commands, and log asynchronous fan timer errors.
 - Use the correct numeric HomeKit Active values for Fan v2 and TV while retaining the Boolean On characteristic for Fan v1.
 
 ### Tests
