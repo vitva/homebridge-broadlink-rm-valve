@@ -27,6 +27,12 @@ class FakeService {
     this.log = log
     this.name = name
     this.characteristics = {}
+    this.linkedServices = []
+  }
+
+  addLinkedService (service) {
+    this.linkedServices.push(service)
+    return this
   }
 
   setCharacteristic (type, value) {
