@@ -517,13 +517,6 @@ class HeaterCoolerAccessory extends BroadlinkRMAccessory {
    * @param {func} callback - callback function passed in by homebridge API to be called at the end of the method
    */
   async monitorTemperature() {
-    if (this.testMode) {
-      if (state.currentTemperature === undefined) {state.currentTemperature = 20;}
-      if (state.currentHumidity === undefined && !config.noHumidity) {state.currentHumidity = 50;}
-      this.updateTemperatureUI();
-      return;
-    }
-
     const { config, host, log, logLevel, name, state } = this;
     const { temperatureFilePath, defaultNowTemperature, w1DeviceID } = config;
 
