@@ -39,3 +39,23 @@ describe('fake service manager wiring', () => {
     expect(accessory.state.switchState).to.equal(true);
   });
 });
+
+describe('Broadlink device routing', () => {
+  it('selects a discovered device by either its IP address or normalized MAC address', () => {
+    const { device } = setup();
+    expect(getDevice({ host: device.host.address })).to.equal(device);
+    expect(getDevice({ host: device.host.macAddress })).to.equal(device);
+  });
+
+  it('uses the first discovered device when no accessory host is configured', () => {
+    const { device: first } = setup();
+    const FakeDevice = require('./fakeDevice');
+    const { addDevice } = require('../../helpers/getDevice');
+    const second = new FakeDevice();
+    addDevice(second);
+
+    expect(getDevice({})).to.equal(first);
+    expect(getDevice({ host: second.host.address })).to.equal(second);
+    expect(getDevice({ host: second.host.macAddress })).to.equal(second);
+  });
+});
