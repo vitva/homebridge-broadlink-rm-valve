@@ -39,7 +39,11 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
     getDataTimeout = null;
 
     device.removeListener('rawData', onRawData);
-    device.cancelLearn();
+    try {
+      device.cancelLearn();
+    } catch (error) {
+      if (log) {log(`Learn Code cancel error: ${error.message || error}`);}
+    }
   };
 
   onRawData = (message) => {
@@ -56,13 +60,20 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
 
   device.on('rawData', onRawData);
 
-  device.enterLearning()
+  try {
+    device.enterLearning();
+  } catch (error) {
+    log(`\x1b[31m[ERROR]\x1b[0m Learn Code (could not start learning: ${error.message || error})`);
+    closeClient();
+    closeClient = null;
+    return;
+  }
   log(`Learn Code (ready)`);
 
   if (callback) {callback();}
 
   getDataTimeout = setTimeout(() => {
-    getData(device);
+    getData(device, log);
   }, 1000)
 
   if (disableTimeout) {return;}
@@ -70,7 +81,11 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
   // Timeout the client after 10 seconds
   timeout = setTimeout(() => {
     log('\x1b[35m[INFO]\x1b[0m Learn Code (stopped - 10s timeout)');
-    device.cancelLearn();
+    try {
+      device.cancelLearn();
+    } catch (error) {
+      log(`Learn Code cancel error: ${error.message || error}`);
+    }
 
     closeClient();
 
@@ -78,14 +93,20 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
   }, 10000); // 10s
 }
 
-const getData = (device) => {
+const getData = (device, log) => {
   if (getDataTimeout) {clearTimeout(getDataTimeout);}
   if (!closeClient) {return;}
 
-  device.checkData()
+  try {
+    device.checkData();
+  } catch (error) {
+    log(`\x1b[31m[ERROR]\x1b[0m Learn Code (failed to request learned data: ${error.message || error})`);
+    stop(log, device);
+    return;
+  }
 
   getDataTimeout = setTimeout(() => {
-    getData(device);
+    getData(device, log);
   }, 1000);
 }
 
