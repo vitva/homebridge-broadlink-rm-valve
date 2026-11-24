@@ -130,7 +130,7 @@ describe('asynchronous HomeKit setters', () => {
 
     const input = tv.serviceManager.getCharacteristic(Characteristic.ActiveIdentifier);
     const callbackPromise = new Promise(resolve => {
-      input.setMethod(0, error => {
+      input.setValue(0, error => {
         callbackCalled = true;
         resolve(error || null);
       });
@@ -162,7 +162,7 @@ describe('asynchronous HomeKit setters', () => {
     tv.performSend = async () => { throw failure; };
 
     const input = tv.serviceManager.getCharacteristic(Characteristic.ActiveIdentifier);
-    const result = await new Promise(resolve => input.setMethod(0, resolve));
+    const result = await new Promise(resolve => input.setValue(0, resolve));
 
     expect(result).to.equal(failure);
     expect(tv.state.input).to.equal(2);
