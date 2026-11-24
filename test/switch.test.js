@@ -364,3 +364,20 @@ describe('switchAccessory', () => {
     expect(sentHexCodeCount).to.equal(0);
   });
 })
+  it('simulates a switch action without a Broadlink device when testMode is enabled', () => {
+    const { device } = setup();
+    const accessory = new Switch(null, {
+      name: 'Virtual test switch',
+      testMode: true,
+      isUnitTest: true,
+      persistState: false,
+      data: { on: 'ON', off: 'OFF' }
+    }, 'FakeServiceManager');
+
+    require('../helpers/getDevice').resetDevices();
+    accessory.serviceManager.setCharacteristic(Characteristic.On, true);
+
+    expect(accessory.state.switchState).to.equal(true);
+    expect(device.sentHexCodes).to.deep.equal([]);
+  });
+
