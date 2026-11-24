@@ -1,6 +1,20 @@
 # Homebridge Broadlink RM Pro + Valve
 
-A Homebridge Broadlink RM plugin fork with an additional HomeKit water-valve accessory. Existing Broadlink accessory types, learning accessories, and configuration options are retained.
+A feature-rich fork of the original Homebridge Broadlink RM plugin. It retains the original Broadlink device integration and accessory types while adding a HomeKit water valve, a visual configuration form, accessory-wide test mode, and optional valve auto-close timing.
+
+## Features
+
+- **Broadlink RM integration:** discover RM devices automatically or configure them manually; send learned IR/RF commands and use the built-in learning accessories.
+- **Original accessory support retained:** switches, multi-switches, outlets, lights, fans, air conditioners, air purifiers, humidifiers/dehumidifiers, heaters/coolers, temperature and humidity sensors, garage doors, locks, windows, window coverings, TVs, and learning accessories.
+- **HomeKit water valve:** add a valve as a native HomeKit accessory, with separate learned commands for opening and closing and selectable valve type (generic, irrigation, shower, or water faucet).
+- **Optional valve auto-close:** set a duration for an open valve; when the countdown expires, the plugin sends the configured close command. A duration of zero disables the timer, so the valve remains open until manually closed. Manually closing the valve cancels the countdown.
+- **Visual Homebridge configuration:** choose an accessory type and configure its relevant fields in the Homebridge Config UI, without having to build the entire platform configuration by hand. Advanced and dynamic command maps, nested sequences, and repeat/pause arrays remain available through JSON Config.
+- **Test mode for every accessory:** simulate HomeKit actions without Broadlink hardware or HEX commands. Test mode does not transmit commands; temperature and humidity sensors use simulated readings of 20 °C and 50% RH.
+- **Safer MQTT TLS defaults:** broker certificates are verified by default. Disabling certificate validation is an explicit per-accessory opt-in.
+
+## Important: valve state and RF/IR feedback
+
+The valve accessory is command-based. Broadlink RM devices send IR/RF commands but do not receive confirmation of the physical valve position. HomeKit therefore displays the last command state reported by the plugin; it cannot verify that the valve actually opened or closed. The optional timer also sends a close command but cannot confirm physical closure. Use a valve/controller with independent position or flow feedback if confirmed state is required.
 
 ## Install
 
@@ -26,13 +40,14 @@ Requires Node.js 22.12 or newer (22, 24, or 26) and Homebridge 2.x.
 
 ## Homebridge visual settings
 
-The plugin includes a native Homebridge Config UI form. After installation, open **Plugins → Homebridge Broadlink RM Pro + Valve → Settings** to configure the platform, discover or manually enter RM devices, and add accessories without editing the main JSON configuration.
+Open **Plugins → Homebridge Broadlink RM Pro + Valve → Settings** to configure the platform, discover or manually enter RM devices, and add accessories.
 
-For a valve, choose **Кран (Valve)** and enter two separate learned commands in **Команды Broadlink**. To verify the HomeKit accessory without an RM device, enable **Тестовый режим (без Broadlink)**; the plugin will simulate open/close actions and will not transmit anything:
+For a valve, choose **Кран (Valve)** and enter two separate learned commands in **Команды Broadlink**:
+
 - **Открыть (HEX)** — command that opens the valve
 - **Закрыть (HEX)** — command that closes the valve
 
-The built-in form includes the full accessory type selector and type-specific settings for the original HomeKit accessories, plus the additional **Valve** type. Settings include automatic on/off behavior, fan speeds and swing mode, light brightness and color commands, TV remote keys and inputs, temperature/humidity options, and accessory-specific timing controls. Dynamic command maps (for example, arbitrary AC temperature-code keys), nested custom sequences, and repeat/pause arrays remain supported in their original format through Homebridge's JSON Config editor.
+Enable **Тестовый режим (без Broadlink)** to check the HomeKit accessory without an RM device. In this mode the plugin simulates actions and sends no commands.
 
 ## Water valve configuration
 
@@ -46,29 +61,34 @@ Use separate learned Broadlink codes for opening and closing. The accessory does
   "data": {
     "open": "YOUR_OPEN_HEX_CODE",
     "close": "YOUR_CLOSE_HEX_CODE"
-  }
+  },
+  "valveType": 3,
+  "persistState": false
 }
 ```
 
-Both `data.open` and `data.close` are required. Each command may be a single learned hex string or an array of command steps (the same repeat/pause format supported by the existing accessories). Learn each command separately with the existing Broadlink learning accessory, then put the resulting code or command sequence in the configuration.
+Both `data.open` and `data.close` are required. Each command may be a single learned hex string or an array of command steps (the same repeat/pause format supported by the existing accessories). Learn each command separately with the existing Broadlink learning accessory.
 
 The optional `valveType` accepts HomeKit values `0` (generic), `1` (irrigation), `2` (shower), or `3` (water faucet, the default).
 
-HomeKit reports the last command dispatched to the Broadlink device. Broadlink RM devices do not provide physical valve-position feedback, so the displayed state cannot confirm that the valve physically moved.
+The valve exposes HomeKit duration characteristics for optional auto-close. Set the duration to zero for manual operation without a timer. When a non-zero duration is set, the plugin counts down and sends the close command at expiry. Manual closing cancels the timer. The countdown is held in memory and is not preserved if Homebridge restarts.
 
-## Tests
+## Accessory test mode (no Broadlink hardware)
 
-```sh
-npm ci
-npm install --no-save --package-lock=false @homebridge/hap-nodejs@2.3.0
-npm run lint
-npm test
+Every accessory type has a **Тестовый режим (без Broadlink)** checkbox. Enable it on an accessory to simulate its HomeKit actions without a Broadlink RM device or HEX commands. Command fields are hidden while test mode is enabled. Temperature and humidity accessories use simulated readings (20 °C and 50% RH). The accessory remains a normal HomeKit service; no Broadlink commands are transmitted.
+
+For example, a virtual test valve can be configured as:
+
+```json
+{
+  "name": "Virtual test valve",
+  "type": "valve",
+  "testMode": true,
+  "persistState": false
+}
 ```
 
-## Source and license
-
-This project is based on [kiwi-cam/homebridge-broadlink-rm](https://github.com/kiwi-cam/homebridge-broadlink-rm). The upstream Apache-2.0 license and attribution are retained.
-
+Turn test mode off and configure the accessory's normal Broadlink commands before using it with real hardware.
 
 ## MQTT security
 
@@ -83,19 +103,15 @@ MQTT connections using TLS verify the broker certificate by default. If your bro
 
 Only enable `mqttAllowInsecureTLS` when you understand the risk. It disables TLS certificate validation and can expose MQTT credentials and messages to interception. The default is `false`.
 
-## Accessory test mode (no Broadlink hardware)
+## Tests
 
-Every accessory type has a **Тестовый режим (без Broadlink)** checkbox. Enable it on an accessory to simulate its HomeKit actions without a Broadlink RM device or HEX commands. Command fields are hidden while test mode is enabled. Temperature and humidity accessories use simulated readings (20 °C and 50% RH). The accessory remains a normal HomeKit service; no Broadlink commands are transmitted.
-
-For example, a virtual valve can be configured as:
-
-```json
-{
-  "name": "Virtual test valve",
-  "type": "valve",
-  "testMode": true,
-  "persistState": false
-}
+```sh
+npm ci
+npm install --no-save --package-lock=false @homebridge/hap-nodejs@2.3.0
+npm run lint
+npm test
 ```
 
-Turn test mode off and configure the accessory's normal Broadlink commands before using it with real hardware.
+## Source and license
+
+This project is based on [kiwi-cam/homebridge-broadlink-rm](https://github.com/kiwi-cam/homebridge-broadlink-rm). The upstream Apache-2.0 license and attribution are retained.
