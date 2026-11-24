@@ -4,6 +4,38 @@ const AirConAccessory = require('../accessories/aircon');
 const HumidifierDehumidifierAccessory = require('../accessories/humidifier-dehumidifier');
 
 describe('file-backed sensor error handling', () => {
+  it('waits for the Broadlink power command before resolving a humidifier switch action', async () => {
+    const accessory = Object.create(HumidifierDehumidifierAccessory.prototype);
+    let resolveSend;
+    let sendStarted = false;
+    let actionCompleted = false;
+
+    accessory.name = 'Test humidifier';
+    accessory.previouslyOff = false;
+    accessory.config = {};
+    accessory.state = { switchState: true };
+    accessory.updateDeviceState = async () => {};
+    accessory.reset = () => {};
+    accessory.performSend = () => {
+      sendStarted = true;
+      return new Promise(resolve => { resolveSend = resolve; });
+    };
+    accessory.checkPingGrace = async () => {};
+    accessory.checkAutoOn = async () => {};
+    accessory.checkAutoOff = async () => {};
+    accessory.log = () => {};
+
+    const action = accessory.setSwitchState('POWER_ON', false).then(() => { actionCompleted = true; });
+    await Promise.resolve();
+
+    expect(sendStarted).to.equal(true);
+    expect(actionCompleted).to.equal(false);
+
+    resolveSend();
+    await action;
+    expect(actionCompleted).to.equal(true);
+  });
+
   it('uses the last temperature and humidity when a configured temperature file is missing', async () => {
     const accessory = Object.create(AirConAccessory.prototype);
     accessory.config = {
