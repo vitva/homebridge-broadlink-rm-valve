@@ -121,17 +121,10 @@ const BroadlinkRMPlatform = class extends HomebridgePlatform {
     const configuredHosts = filterConfiguredHosts(hosts, log, logLevel);
 
     if (configuredHosts.length === 0) {
-      if (hosts && hosts.length > 0 && logLevel <= 3) {
-        log(`\x1b[33m[CONFIG WARNING]\x1b[0m Ignoring blank Broadlink host placeholders; automatic discovery remains enabled.`);
-      }
       if (logLevel <=2) {log(`\x1b[35m[INFO]\x1b[0m Automatically discovering Broadlink RM devices.`)}
       discoverDevices(true, log, logLevel, config.deviceDiscoveryTimeout);
 
       return;
-    }
-
-    if (hosts.length !== configuredHosts.length && logLevel <= 3) {
-      log(`\x1b[33m[CONFIG WARNING]\x1b[0m Ignoring ${hosts.length - configuredHosts.length} empty or invalid Broadlink host row(s).`);
     }
 
     discoverDevices(false, log, logLevel);
