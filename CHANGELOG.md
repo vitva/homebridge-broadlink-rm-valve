@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Catch malformed platform and accessory configuration errors, log them, and skip invalid accessories without aborting platform startup.
 - Fall back to the last sensor reading when temperature, humidity, or 1-Wire source files cannot be read; avoid exceptions in asynchronous file callbacks.
 - Await humidifier state transitions and Broadlink power commands, and log asynchronous fan timer errors.
+- Sanitize user-controlled humidifier history filenames so path separators cannot escape the Homebridge storage directory.
 - Use the correct numeric HomeKit Active values for Fan v2 and TV while retaining the Boolean On characteristic for Fan v1.
 
 ### Tests
