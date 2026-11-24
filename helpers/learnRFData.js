@@ -37,17 +37,53 @@ const stop = (log, device, logLevel) => {
 const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) => {
   stop()
 
+  let callbackCalled = false;
+  let turnOffCalled = false;
+  const completeStart = (error) => {
+    if (callbackCalled) {return;}
+    callbackCalled = true;
+    if (callback) {callback(error || null);}
+  };
+  const turnOffOnce = () => {
+    if (turnOffCalled) {return;}
+    turnOffCalled = true;
+    if (turnOffCallback) {turnOffCallback();}
+  };
+  const failSession = (error) => {
+    if (log) {log(`\\x1b[31m[ERROR]\\x1b[0m Scan RF (${error.message || error})`);}
+    if (currentDevice) {
+      try {currentDevice.cancelLearn();} catch (cancelError) {
+        if (log) {log(`Scan RF cancel error: ${cancelError.message || cancelError}`);}
+      }
+    }
+    if (closeClient) {
+      closeClient();
+      closeClient = null;
+    }
+    isClosingClient = false;
+    currentDevice = null;
+    completeStart(error);
+    turnOffOnce();
+  };
+
   // Get the Broadlink device
   const device = getDevice({ host, log, learnOnly: true })
-  if (!device) { 
-    return log(`\x1b[35m[INFO]\x1b[0m Learn Code (Couldn't learn code, device not found)`);
+  if (!device) {
+    failSession(new Error('Broadlink device not found'));
+    return;
   }
 
   this.initalDebug = device.debug;
   if (logLevel <=1) {device.debug = true;}
 
-  if (!device.enterLearning) {return log(`\x1b[31m[ERROR]\x1b[0m Learn Code (IR/RF learning not supported for device at ${host})`);}
-  if (!device.enterRFSweep) {return log(`\x1b[31m[ERROR]\x1b[0m Scan RF (RF learning not supported for device (${device.type}) at ${host})`);}
+  if (!device.enterLearning) {
+    failSession(new Error(`IR/RF learning not supported for device at ${host}`));
+    return;
+  }
+  if (!device.enterRFSweep) {
+    failSession(new Error(`RF learning not supported for device (${device.type}) at ${host}`));
+    return;
+  }
 
   currentDevice = device
 
@@ -87,7 +123,7 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
         return device.enterLearning();
       } catch (error) {
         log(`\x1b[31m[ERROR]\x1b[0m Scan RF (could not restart learning: ${error.message || error})`);
-        stop(log, device, logLevel);
+        failSession(error);
         return;
       }
     }
@@ -95,7 +131,7 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
     log(`\x1b[35m[ACTION]\x1b[0m Keep holding that button!`)
 
     getDataTimeout2 = setTimeout(() => {
-      getData2(device, log, logLevel);
+      getData2(device, log, logLevel, failSession);
     }, 1000);
   };
 
@@ -109,7 +145,7 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
     log(`\x1b[35m[ACTION]\x1b[0m Press the RF button multiple times with a pause between them to get code.`);
 
     getDataTimeout3 = setTimeout(() => {
-      getData3(device, log, logLevel);
+      getData3(device, log, logLevel, failSession);
     }, 1000);
   };
 
@@ -128,7 +164,9 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
 
     closeClient();
 
-    turnOffCallback();
+    turnOffOnce();
+    closeClient = null;
+    currentDevice = null;
   };
 
   device.on('rawRFData', onRawData);
@@ -139,18 +177,16 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
     device.enterRFSweep();
   } catch (error) {
     log(`\x1b[31m[ERROR]\x1b[0m Scan RF (could not start scan: ${error.message || error})`);
-    closeClient();
-    closeClient = null;
-    currentDevice = null;
+    failSession(error);
     return;
   }
   log(`\x1b[35m[INFO]\x1b[0m Scan RF (scanning)`);
   log(`\x1b[35m[ACTION]\x1b[0m Hold down the button that sends the RF frequency.`);
 
-  if (callback) {callback();}
+  completeStart();
 
   getDataTimeout = setTimeout(() => {
-    getData(device, log, logLevel);
+    getData(device, log, logLevel, failSession);
   }, 1000);
 
   if (disableTimeout) {return;}
@@ -166,13 +202,14 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
     setTimeout(() => {
       log('\x1b[35m[INFO]\x1b[0m Scan RF (stopped - 60s timeout)');
       closeClient();
-
-      turnOffCallback();
+      closeClient = null;
+      currentDevice = null;
+      turnOffOnce();
     }, 1000);
   }, 60 * 1000); //60s
 }
 
-const getData = (device, log, logLevel) => {
+const getData = (device, log, logLevel, failSession) => {
   if (getDataTimeout) {clearTimeout(getDataTimeout);}
   if (!closeClient) {return;}
 
@@ -180,16 +217,16 @@ const getData = (device, log, logLevel) => {
     device.checkRFData();
   } catch (error) {
     log(`\x1b[31m[ERROR]\x1b[0m Scan RF (failed to request frequency data: ${error.message || error})`);
-    stop(log, device, logLevel);
+    failSession(error);
     return;
   }
 
   getDataTimeout = setTimeout(() => {
-    getData(device, log, logLevel);
+    getData(device, log, logLevel, failSession);
   }, 1000);
 }
 
-const getData2 = (device, log, logLevel) => {
+const getData2 = (device, log, logLevel, failSession) => {
   if (getDataTimeout2) {clearTimeout(getDataTimeout2);}
   if (!closeClient) {return;}
 
@@ -202,11 +239,11 @@ const getData2 = (device, log, logLevel) => {
   }
 
   getDataTimeout2 = setTimeout(() => {
-    getData2(device, log, logLevel);
+    getData2(device, log, logLevel, failSession);
   }, 1000);
 }
 
-const getData3 = (device, log, logLevel) => {
+const getData3 = (device, log, logLevel, failSession) => {
   if (getDataTimeout3) {clearTimeout(getDataTimeout3);}
   if (!closeClient) {return;}
 
@@ -219,7 +256,7 @@ const getData3 = (device, log, logLevel) => {
   }
 
   getDataTimeout3 = setTimeout(() => {
-    getData3(device, log, logLevel);
+    getData3(device, log, logLevel, failSession);
   }, 1000);
 }
 
