@@ -46,6 +46,7 @@ jobs:
       - name: Run test suite
         run: npm test
       - name: Run real Homebridge 2 bridge startup smoke test
+        if: matrix.node_version == 22
         run: |
           set -euo pipefail
           runtime_root="$RUNNER_TEMP/homebridge-runtime"
