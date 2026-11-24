@@ -52,7 +52,7 @@ jobs:
           runtime_root="$RUNNER_TEMP/homebridge-runtime"
           mkdir -p "$runtime_root/storage"
           npm install --prefix "$runtime_root" --no-save --package-lock=false homebridge@^2.0.0 "$GITHUB_WORKSPACE"
-          cat > "$runtime_root/config.json" <<'JSON'
+          cat > "$runtime_root/storage/config.json" <<'JSON'
           {
             "bridge": {
               "name": "Broadlink Runtime Smoke",
@@ -75,7 +75,6 @@ jobs:
           "$runtime_root/node_modules/.bin/homebridge" \
             -U "$runtime_root/storage" \
             -P "$runtime_root/node_modules" \
-            -C "$runtime_root/config.json" \
             > "$runtime_root/homebridge.log" 2>&1 &
           homebridge_pid=$!
           for attempt in $(seq 1 30); do
