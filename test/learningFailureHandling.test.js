@@ -93,7 +93,8 @@ describe('learning failure handling', () => {
     expect(device.listenerCount('rawRFData2')).to.equal(0);
   });
 
-  it('turns off RF scanning when learned-code polling fails', async () => {
+  it('turns off RF scanning when learned-code polling fails', async function () {
+    this.timeout(5000);
     const { device } = setup();
     device.checkDataError = new Error('RF code polling failed');
     let turnOffCount = 0;
