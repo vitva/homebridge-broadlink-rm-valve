@@ -22,6 +22,7 @@ class BroadlinkRMAccessory extends HomebridgeAccessory {
 
     super(log, config, serviceManagerType);
     if (config.debug) {this.debug = true}
+    this.testMode = config.testMode === true;
 
     this.manufacturer = 'Broadlink';
     this.model = 'RM Mini or Pro';
@@ -61,6 +62,10 @@ class BroadlinkRMAccessory extends HomebridgeAccessory {
   }
 
   performSetValueAction ({ host, data, log, name, logLevel }) {
+    if (this.testMode) {
+      log(`${name} test mode: simulated Broadlink command.`);
+      return;
+    }
     sendData({ host, hexData: data, log, name, logLevel });
   }
   
@@ -79,6 +84,11 @@ class BroadlinkRMAccessory extends HomebridgeAccessory {
 
   async performSend (data, actionCallback) {
     const { logLevel, config, host, log, name } = this;
+
+    if (this.testMode) {
+      log(`${name} test mode: simulated Broadlink command.`);
+      return;
+    }
 
     //Error catch
     if(data === undefined){return}
