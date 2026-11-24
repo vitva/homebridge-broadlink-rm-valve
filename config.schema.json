@@ -1299,28 +1299,9 @@
             "replaceAutoMode": {
               "title": "Режим вместо Auto",
               "type": "string",
-              "oneOf": [
-                {
-                  "title": "Охлаждение",
-                  "enum": [
-                    "cool"
-                  ]
-                },
-                {
-                  "title": "Нагрев",
-                  "enum": [
-                    "heat"
-                  ]
-                },
-                {
-                  "title": "Не заменять",
-                  "enum": [
-                    "none"
-                  ]
-                }
-              ],
+              "description": "Значение режима, используемое вместо Auto; по умолчанию cool.",
               "condition": {
-                "functionBody": "return [\"air-conditioner\"].includes(model.accessories?.[arrayIndices]?.type);"
+                "functionBody": "return model.accessories?.[arrayIndices]?.type === 'air-conditioner';"
               }
             },
             "pseudoDeviceTemperature": {
