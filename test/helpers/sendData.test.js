@@ -90,3 +90,94 @@ describe('RF and IR command transmission simulation', () => {
   });
 });
 
+
+describe('Broadlink transport failures', () => {
+  it('rejects when no Broadlink device is available', async () => {
+    const { resetDevices } = require('../../helpers/getDevice');
+    setup();
+    resetDevices();
+
+    let error;
+    try {
+      await sendData({ hexData: 'AABB', log: () => {}, name: 'Missing device', logLevel: 6 });
+    } catch (caught) {
+      error = caught;
+    }
+
+    expect(error).to.be.instanceOf(Error);
+    expect(error.message).to.include('no device found');
+  });
+
+  it('rejects when the selected device cannot send IR or RF codes', async () => {
+    const { device } = setup();
+    device.sendData = undefined;
+
+    let error;
+    try {
+      await sendData({
+        host: device.host.address,
+        hexData: 'AABB',
+        log: () => {},
+        name: 'Unsupported device',
+        logLevel: 6
+      });
+    } catch (caught) {
+      error = caught;
+    }
+
+    expect(error).to.be.instanceOf(Error);
+    expect(error.message).to.include("doesn't support");
+  });
+
+  it('rejects an invalid Pronto code instead of reporting a successful send', async () => {
+    setup();
+
+    let error;
+    try {
+      await sendData({
+        hexData: '0000 006D 0000 0001',
+        log: () => {},
+        name: 'Invalid Pronto',
+        logLevel: 6
+      });
+    } catch (caught) {
+      error = caught;
+    }
+
+    expect(error).to.be.instanceOf(Error);
+    expect(error.message).to.include('conversion to a Broadlink code failed');
+  });
+
+  it('waits for the asynchronous Broadlink transport and propagates its rejection', async () => {
+    const { device } = setup();
+    let completeSend;
+    let settled = false;
+    device.sendData = () => new Promise((resolve, reject) => {
+      completeSend = { resolve, reject };
+    });
+
+    const pendingSend = sendData({
+      host: device.host.address,
+      hexData: 'AABB',
+      log: () => {},
+      name: 'Async transport',
+      logLevel: 6
+    }).then(() => { settled = true; });
+
+    await Promise.resolve();
+    expect(completeSend).to.be.an('object');
+    expect(settled).to.equal(false);
+
+    completeSend.reject(new Error('transport failure'));
+    let error;
+    try {
+      await pendingSend;
+    } catch (caught) {
+      error = caught;
+    }
+
+    expect(error).to.be.instanceOf(Error);
+    expect(error.message).to.equal('transport failure');
+    expect(settled).to.equal(false);
+  });
+});
