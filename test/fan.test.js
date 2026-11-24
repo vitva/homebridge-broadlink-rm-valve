@@ -480,6 +480,25 @@ describe('fanv1Accessory HomeKit compatibility', () => {
     expect(device.hasSentCode('OFF')).to.equal(true);
   });
 
+  it('does not cache a requested speed when the Broadlink send fails', async () => {
+    const { device } = setup();
+    const fan = new Fanv1(null, {
+      ...defaultConfig,
+      host: device.host.address
+    }, 'FakeServiceManager');
+    const failure = new Error('simulated fan speed send failure');
+    fan.state.fanSpeed = 10;
+    fan.lastFanSpeed = 10;
+    fan.performSend = async () => { throw failure; };
+
+    const speed = fan.serviceManager.getCharacteristic(Characteristic.RotationSpeed);
+    const result = await new Promise(resolve => speed.setMethod(20, resolve));
+
+    expect(result).to.equal(failure);
+    expect(fan.state.fanSpeed).to.equal(10);
+    expect(fan.lastFanSpeed).to.equal(10);
+  });
+
   it('uses a valid maxValue property for the legacy fan speed characteristic', () => {
     const { device } = setup();
     const fan = new Fanv1(null, {
