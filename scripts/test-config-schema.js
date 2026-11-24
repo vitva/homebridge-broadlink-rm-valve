@@ -100,7 +100,7 @@ const expectedCommandSettings = [
 ];
 expectedCommandSettings.forEach(key => assert.ok(accessoryProperties.data.properties[key], `Missing command setting: data.${key}`));
 assert.equal(accessoryProperties.data.additionalProperties, true);
-assert.equal(accessoryProperties.additionalProperties, true);
+assert.equal(accessoryArray.items.additionalProperties, true);
 assert.ok(accessoryProperties.data.properties.remote.properties.arrowUp);
 assert.ok(accessoryProperties.data.properties.inputs.items.properties.data);
 assert.ok(accessoryProperties.data.properties.cool.properties.temperatureCodes);
