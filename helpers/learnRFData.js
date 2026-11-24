@@ -139,7 +139,7 @@ const start = (host, callback, turnOffCallback, log, disableTimeout, logLevel) =
     if (!closeClient) {return;}
 
     if (getDataTimeout2) {clearTimeout(getDataTimeout2);}
-    getDataTimeout = null;
+    getDataTimeout2 = null;
 
     log(`\x1b[35m[INFO]\x1b[0m Scan RF (found frequency - 2 of 2)`)
     log(`\x1b[35m[ACTION]\x1b[0m Press the RF button multiple times with a pause between them to get code.`);
