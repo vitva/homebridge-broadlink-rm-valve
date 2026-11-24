@@ -70,7 +70,7 @@ class FanAccessory extends BroadlinkRMAccessory {
 
     const powerCharacteristic = this.getPowerCharacteristic();
     if (this.serviceManager.getCharacteristic(powerCharacteristic) === undefined) {
-      this.serviceManager.setCharacteristic(powerCharacteristic, false);
+      this.serviceManager.setCharacteristic(powerCharacteristic, this.getPowerCharacteristicValue(false));
     }
   }
 
@@ -101,12 +101,12 @@ class FanAccessory extends BroadlinkRMAccessory {
 
     if (config.pingIPAddressStateOnly) {
       state.switchState = active ? true : false;
-      serviceManager.updateCharacteristic(this.getPowerCharacteristic(), state.switchState);
+      serviceManager.updateCharacteristic(this.getPowerCharacteristic(), this.getPowerCharacteristicValue(state.switchState));
 
       return;
     }
 
-    const value = active ? true : false;
+    const value = this.getPowerCharacteristicValue(active);
     serviceManager.setCharacteristic(this.getPowerCharacteristic(), value);
   }
 
@@ -137,7 +137,7 @@ class FanAccessory extends BroadlinkRMAccessory {
         this.autoOffTimeoutPromise = delayForDuration(onDuration);
         await this.autoOffTimeoutPromise;
 
-        serviceManager.setCharacteristic(Characteristic.Active, false);
+        serviceManager.setCharacteristic(this.getPowerCharacteristic(), this.getPowerCharacteristicValue(false));
       }
     });
   }
@@ -153,7 +153,7 @@ class FanAccessory extends BroadlinkRMAccessory {
         this.autoOnTimeoutPromise = delayForDuration(offDuration);
         await this.autoOnTimeoutPromise;
 
-        serviceManager.setCharacteristic(Characteristic.Active, true);
+        serviceManager.setCharacteristic(this.getPowerCharacteristic(), this.getPowerCharacteristicValue(true));
       }
     });
   }
