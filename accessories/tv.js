@@ -68,7 +68,7 @@ class TVAccessory extends BroadlinkRMAccessory {
     }
     
 	  if (this.serviceManager.getCharacteristic(Characteristic.Active) === undefined) {
-      this.serviceManager.setCharacteristic(Characteristic.Active, false);
+      this.serviceManager.setCharacteristic(Characteristic.Active, this.getActiveValue(false));
     }
   }
   
@@ -99,12 +99,12 @@ class TVAccessory extends BroadlinkRMAccessory {
 
     if (config.pingIPAddressStateOnly) {
       state.switchState = active ? true : false;
-      serviceManager.updateCharacteristic(Characteristic.Active,state.switchState);
+      serviceManager.updateCharacteristic(Characteristic.Active, this.getActiveValue(state.switchState));
 
       return;
     }
 
-    const value = active ? true : false;
+    const value = this.getActiveValue(active);
     serviceManager.setCharacteristic(Characteristic.Active, value);
   }
 
@@ -148,7 +148,7 @@ class TVAccessory extends BroadlinkRMAccessory {
         this.autoOffTimeoutPromise = delayForDuration(onDuration);
         await this.autoOffTimeoutPromise;
 
-        serviceManager.setCharacteristic(Characteristic.Active, false);
+        serviceManager.setCharacteristic(Characteristic.Active, this.getActiveValue(false));
       }
     });
   }
@@ -166,7 +166,7 @@ class TVAccessory extends BroadlinkRMAccessory {
         this.autoOnTimeoutPromise = delayForDuration(offDuration);
         await this.autoOnTimeoutPromise;
 
-        serviceManager.setCharacteristic(Characteristic.Active, true);
+        serviceManager.setCharacteristic(Characteristic.Active, this.getActiveValue(true));
       }
     });
   }
