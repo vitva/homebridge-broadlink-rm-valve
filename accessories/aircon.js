@@ -41,7 +41,7 @@ class AirConAccessory extends BroadlinkRMAccessory {
     }
 
     this.temperatureCallbackQueue = {};
-    this.monitorTemperature();
+    this.monitorTemperature().catch(error => this.log(`${this.name} monitorTemperature error: ${error.message || error}`));
   }
 
   correctReloadedState (state) {
@@ -435,9 +435,7 @@ class AirConAccessory extends BroadlinkRMAccessory {
       if (!device) {
         await delayForDuration(1);
 
-        this.monitorTemperature();
-
-        return;
+        return this.monitorTemperature();
       }
 
       device.on('temperature', this.onTemperature.bind(this));
