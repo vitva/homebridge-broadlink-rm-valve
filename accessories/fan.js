@@ -10,6 +10,10 @@ class FanAccessory extends BroadlinkRMAccessory {
     return Characteristic.Active;
   }
 
+  getPowerCharacteristicValue (active) {
+    return active ? Characteristic.Active.ACTIVE : Characteristic.Active.INACTIVE;
+  }
+
   constructor(log, config = {}, serviceManagerType) {
     super(log, config, serviceManagerType);
 
