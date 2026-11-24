@@ -6,6 +6,14 @@ const ping = require('../helpers/ping');
 const arp = require('../helpers/arp')
 
 class FanAccessory extends BroadlinkRMAccessory {
+  getPowerCharacteristic () {
+    return Characteristic.Active;
+  }
+
+  getPowerCharacteristicValue (active) {
+    return active ? Characteristic.Active.ACTIVE : Characteristic.Active.INACTIVE;
+  }
+
   constructor(log, config = {}, serviceManagerType) {
     super(log, config, serviceManagerType);
 
@@ -64,16 +72,18 @@ class FanAccessory extends BroadlinkRMAccessory {
       this.pingGraceTimeout = null;
     }
 
-    if (this.serviceManager.getCharacteristic(Characteristic.Active) === undefined) {
-      this.serviceManager.setCharacteristic(Characteristic.Active, false);
+    const powerCharacteristic = this.getPowerCharacteristic();
+    if (this.serviceManager.getCharacteristic(powerCharacteristic) === undefined) {
+      this.serviceManager.setCharacteristic(powerCharacteristic, this.getPowerCharacteristicValue(false));
     }
   }
 
   checkAutoOnOff() {
+    const { log, name } = this;
     this.reset();
-    this.checkPingGrace();
-    this.checkAutoOn();
-    this.checkAutoOff();
+    this.checkPingGrace().catch(error => log(`${name} ping grace error: ${error.message || error}`));
+    this.checkAutoOn().catch(error => log(`${name} automatic-on error: ${error.message || error}`));
+    this.checkAutoOff().catch(error => log(`${name} automatic-off error: ${error.message || error}`));
   }
 
   checkPing(ping) {
@@ -96,13 +106,13 @@ class FanAccessory extends BroadlinkRMAccessory {
 
     if (config.pingIPAddressStateOnly) {
       state.switchState = active ? true : false;
-      serviceManager.updateCharacteristic(Characteristic.Active,state.switchState);
+      serviceManager.updateCharacteristic(this.getPowerCharacteristic(), this.getPowerCharacteristicValue(state.switchState));
 
       return;
     }
 
-    const value = active ? true : false;
-    serviceManager.setCharacteristic(Characteristic.Active, value);
+    const value = this.getPowerCharacteristicValue(active);
+    serviceManager.setCharacteristic(this.getPowerCharacteristic(), value);
   }
 
   async checkPingGrace () {
@@ -132,7 +142,7 @@ class FanAccessory extends BroadlinkRMAccessory {
         this.autoOffTimeoutPromise = delayForDuration(onDuration);
         await this.autoOffTimeoutPromise;
 
-        serviceManager.setCharacteristic(Characteristic.Active, false);
+        serviceManager.setCharacteristic(this.getPowerCharacteristic(), this.getPowerCharacteristicValue(false));
       }
     });
   }
@@ -148,13 +158,14 @@ class FanAccessory extends BroadlinkRMAccessory {
         this.autoOnTimeoutPromise = delayForDuration(offDuration);
         await this.autoOnTimeoutPromise;
 
-        serviceManager.setCharacteristic(Characteristic.Active, true);
+        serviceManager.setCharacteristic(this.getPowerCharacteristic(), this.getPowerCharacteristicValue(true));
       }
     });
   }
 
   async setSwitchState(hexData, previousValue) {
     const { config, state, serviceManager } = this;
+    const previousLastFanSpeed = this.lastFanSpeed;
     if (!state.switchState) {
       this.lastFanSpeed = undefined;
     }
@@ -171,7 +182,12 @@ class FanAccessory extends BroadlinkRMAccessory {
 
     this.reset();
 
-    if (hexData) {await this.performSend(hexData);}
+    try {
+      if (hexData) {await this.performSend(hexData);}
+    } catch (error) {
+      this.lastFanSpeed = previousLastFanSpeed;
+      throw error;
+    }
   }
 
   async setFanSpeed(hexData) {
@@ -238,10 +254,10 @@ class FanAccessory extends BroadlinkRMAccessory {
       }
     }
 
-    this.lastFanSpeed = closest;
-
     await this.performSend(hexData);
 
+    // Commit the cached speed only after Broadlink confirms the send succeeded.
+    this.lastFanSpeed = closest;
     this.checkAutoOnOff();
   }
 

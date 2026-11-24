@@ -1,12 +1,58 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [4.4.21-valve.12] - 2026-11-25
+
+### Fixed
+- Keep the platform idle until at least one enabled accessory is configured; do not publish automatic learning accessories for an empty configuration.
+- Handle asynchronous Broadlink ping errors without throwing from the probe callback.
+- Catch malformed platform and accessory configuration errors, log them, and skip invalid accessories without aborting platform startup.
+- Fall back to the last sensor reading when temperature, humidity, or 1-Wire source files cannot be read; avoid exceptions in asynchronous file callbacks.
+- Await humidifier state transitions and Broadlink power commands, and log asynchronous fan timer errors.
+- Sanitize user-controlled humidifier history filenames so path separators cannot escape the Homebridge storage directory.
+- Wait for HomeKit setter actions and Broadlink sends to finish before acknowledging writes; return command failures through the HomeKit callback.
+- Restore the previous accessory state when a HomeKit command fails, avoiding a stale optimistic state.
+- Keep RF scan timers and event listeners isolated per session so delayed cleanup cannot interrupt a replacement scan.
+- Await TV input, remote, power, volume, and mute commands before acknowledging HomeKit writes.
+- Preserve the cached fan speed and humidifier operating state when Broadlink commands fail.
+- Replace active IR learning sessions safely without leaving stale listeners or throwing during cleanup.
+- Catch temperature monitor failures and await retry chains instead of leaving rejected promises unhandled.
+- Catch Broadlink discovery, device registration, and synchronous update-check errors in their asynchronous callbacks.
+- Catch failures while requesting IR/RF learning data and stop the learning session cleanly instead of throwing from timer or device-event callbacks.
+- Use the correct numeric HomeKit Active values for Fan v2 and TV while retaining the Boolean On characteristic for Fan v1.
+
+### Tests
+- Add regression coverage for empty platform configuration, asynchronous ping failures, HomeKit characteristic formats, and persistence-path confinement.
+
+### Validation
+- GitHub Actions passed on Node.js 22, 24, and 26.
+- 202 Mocha tests passed on each Node.js version; ESLint passed on all three.
+- Full and production npm audits reported zero vulnerabilities.
+- The release-candidate npm archive audit passed.
+
+## [4.4.21-valve.11] - 2026-11-24
+
+### Added
+- Add an optional HomeKit Valve auto-close timer.
+
+### Fixed
+- Synchronize the Valve Active and InUse characteristics when opening and closing.
+
+### Changed
+- Refresh the README, package description, and Homebridge Config UI descriptions to document the expanded feature set.
+
 ## [4.4.21-valve.10] - 2026-11-24
 
 ### Added
 - Add a universal per-accessory test mode that simulates accessory actions without a Broadlink RM device or HEX commands.
 - Expose the test-mode toggle for every accessory type in Homebridge Config UI and hide Broadlink command fields while it is enabled.
 - Add integration coverage that creates a real HAP Valve service and exercises simulated state changes without a device.
-
-### Validation
-- Automated CI must pass on Node.js 22, 24, and 26 before release.
 
 ## [4.4.21-valve.9] - 2026-11-24
 
@@ -18,19 +64,24 @@
 - Pull request checks passed on Node.js 22, 24, and 26, including lint, tests, and release archive checks.
 - The published `.8` package remains unchanged; this release contains the Config UI editor fix.
 
-# Changelog
+## [4.4.21-valve.8] - 2026-11-24
+
+### Fixed
+- Fix the Homebridge Config UI accessory array schema so the editor can render the configured accessories.
+- Correct nested Broadlink command schema handling and add regression tests for valid accessory arrays.
+
 ## [4.4.21-valve.7] - 2026-11-24
 
 ### Added
-- Expanded the Homebridge Config UI accessory form with type-specific settings and command fields for the original accessory types.
-- Preserved the original accessory selector order and appended the HomeKit Valve as the final type.
-- Added UI fields for fan speed and swing commands, light brightness and color, TV remote/input commands, humidifier/dehumidifier modes, heater/cooler modes, and accessory timing and sensor options.
+- Expand the Homebridge Config UI accessory form with type-specific settings and command fields for the original accessory types.
+- Preserve the original accessory selector order and append the HomeKit Valve as the final type.
+- Add UI fields for fan speed and swing commands, light brightness and color, TV remote/input commands, humidifier/dehumidifier modes, heater/cooler modes, and accessory timing and sensor options.
 
 ### Fixed
 - Ignore empty accessory and Broadlink host placeholders created by the Homebridge Config UI, preventing fresh-install configuration errors and keeping automatic Broadlink discovery enabled when no valid manual hosts are configured.
 
 ### Compatibility
-- Retained the existing Homebridge 2.x / Node.js 22, 24, and 26 compatibility target and the original dynamic JSON configuration format for custom temperature-code maps and complex command sequences.
+- Retain Homebridge 2.x / Node.js 22, 24, and 26 compatibility and the original dynamic JSON configuration format for custom temperature-code maps and complex command sequences.
 
 ### Validation
 - GitHub Actions passed on Node.js 22, 24, and 26 with the Homebridge 2 HAP 2.3.0 runtime.
@@ -45,13 +96,12 @@
 - Keep valid MQTT topic entries active when other entries in the configured list are invalid; warn about skipped entries.
 
 ### Changed
-- Documented npm, Homebridge UI, and direct GitHub installation methods.
+- Document npm, Homebridge UI, and direct GitHub installation methods.
 
 ### Validation
 - Post-merge GitHub Actions passed on Node.js 22, 24, and 26.
 - All 147 automated tests passed; ESLint passed.
 - Full and production npm audits reported zero vulnerabilities.
-
 
 ## [4.4.21-valve.5] - 2026-11-23
 
@@ -63,11 +113,6 @@
 - Post-merge GitHub Actions passed on Node.js 22, 24, and 26.
 - The full test suite passed (143 tests), and full and production npm audits reported zero vulnerabilities.
 - All 89 files in the published npm archive matched the Git release tag.
-
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [4.4.21-valve.4] - 2026-11-23
 
@@ -84,14 +129,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [4.4.21-valve.3] - 2026-11-23
 
 ### Added
-- Added a HomeKit Valve accessory with separate Broadlink commands for opening and closing.
-- Added native Homebridge Config UI fields for valve type and open/close commands.
-- Added an ESM entry point while retaining the CommonJS entry point.
+- Add a HomeKit Valve accessory with separate Broadlink commands for opening and closing.
+- Add native Homebridge Config UI fields for valve type and open/close commands.
+- Add an ESM entry point while retaining the CommonJS entry point.
 
 ### Changed
-- Declared compatibility with Homebridge 2 and Node.js 22, 24, and 26.
-- Clarified that HomeKit displays the last command dispatched to Broadlink; it cannot confirm the valve's physical position.
-- Expanded automated checks for valve behavior, configuration schema, and module exports.
+- Declare compatibility with Homebridge 2 and Node.js 22, 24, and 26.
+- Clarify that HomeKit displays the last command dispatched to Broadlink; it cannot confirm the valve's physical position.
+- Expand automated checks for valve behavior, configuration schema, and module exports.
 
 ### Validation
 - GitHub Actions passed on Node.js 22, 24, and 26, including dependency installation, Homebridge 2 HAP test runtime setup, lint, and the full test suite.

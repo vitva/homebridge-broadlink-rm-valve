@@ -41,7 +41,7 @@ class AirConAccessory extends BroadlinkRMAccessory {
     }
 
     this.temperatureCallbackQueue = {};
-    this.monitorTemperature();
+    this.monitorTemperature().catch(error => this.log(`${this.name} monitorTemperature error: ${error.message || error}`));
   }
 
   correctReloadedState (state) {
@@ -435,9 +435,7 @@ class AirConAccessory extends BroadlinkRMAccessory {
       if (!device) {
         await delayForDuration(1);
 
-        this.monitorTemperature();
-
-        return;
+        return this.monitorTemperature();
       }
 
       device.on('temperature', this.onTemperature.bind(this));
@@ -558,14 +556,14 @@ class AirConAccessory extends BroadlinkRMAccessory {
     if (logLevel <=1) {log(`\x1b[34m[DEBUG]\x1b[0m ${name} updateTemperatureFromFile reading file: ${temperatureFilePath}`);}
 
     fs.readFile(temperatureFilePath, 'utf8', (err, data) => {
-      if (err) {
-        if (logLevel <=4) {log(`\x1b[31m[ERROR] \x1b[0m${name} updateTemperatureFromFile\n\n${err.message}`);}
-      }
-
-      if (data === undefined || data.trim().length === 0) {
+      if (err || typeof data !== 'string' || data.trim().length === 0) {
+        if (err && logLevel <=4) {log(`\x1b[31m[ERROR] \x1b[0m${name} updateTemperatureFromFile\n\n${err.message}`);}
         if (logLevel <=3) {log(`\x1b[33m[WARNING]\x1b[0m ${name} updateTemperatureFromFile error reading file: ${temperatureFilePath}, using previous Temperature`);}
         if (!noHumidity) {humidity = (state.currentHumidity || 0);}
         temperature = (state.currentTemperature || 0);
+        state.batteryLevel = 100;
+        this.onTemperature(temperature, humidity);
+        return;
       }
 
       const lines = data.split(/\r?\n/);
@@ -610,10 +608,10 @@ class AirConAccessory extends BroadlinkRMAccessory {
         log(`\x1b[31m[ERROR] \x1b[0m${name} updateTemperatureFromW1\n\n${err.message}`);
       }
 
-      if(data.includes("t=")){
-        var matches = data.match(/t=([0-9]+)/);
-        temperature = parseInt(matches[1]) / 1000;
-      }else{
+      const matches = typeof data === 'string' ? data.match(/t=([0-9]+)/) : null;
+      if (!err && matches) {
+        temperature = parseInt(matches[1], 10) / 1000;
+      } else {
         if (logLevel <=3) {log(`\x1b[33m[WARNING]\x1b[0m ${name} updateTemperatureFromW1 error reading file: ${fName}, using previous Temperature`);}
         temperature = (state.currentTemperature || 0);
       }

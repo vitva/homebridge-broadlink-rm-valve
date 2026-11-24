@@ -4,6 +4,14 @@ const catchDelayCancelError = require('../helpers/catchDelayCancelError');
 const delayForDuration = require('../helpers/delayForDuration');
 
 class Fanv1Accessory extends FanAccessory {
+  getPowerCharacteristic () {
+    return Characteristic.On;
+  }
+
+  getPowerCharacteristicValue (active) {
+    return Boolean(active);
+  }
+
   setDefaults () {
     super.setDefaults();
     const { config, state } = this;
@@ -84,8 +92,14 @@ class Fanv1Accessory extends FanAccessory {
         setValuePromise: this.setFanSpeed.bind(this),
 		    minStep: config.stepSize,
 		    minValue: 0,
-		    maxVlue: 100
+		    maxValue: 100
       }
+    });
+
+    this.serviceManager.getCharacteristic(Characteristic.RotationSpeed).setProps({
+      minStep: config.stepSize,
+      minValue: 0,
+      maxValue: 100
     });
 
     if (config.showRotationDirection) {

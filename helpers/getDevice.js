@@ -31,7 +31,7 @@ const startPing = (device, log) => {
       ping.sys.probe(device.host.address, (active, err) => {
         if(err){
           log(`Error pinging Broadlink RM device at ${device.host.address} (${device.host.macAddress || ''}): ${err}`);
-          throw err;
+          return;
         }
         
         if (!active && device.state === 'active' && device.retryCount === 2) {
@@ -69,33 +69,45 @@ const discoverDevices = (automatic = true, log, logLevel, deviceDiscoveryTimeout
   //broadlink.logLevel = logLevel;
 
   if (automatic) {
-    this.discoverDevicesInterval = setInterval(() => {
-      broadlink.discover();
-    }, 2000);
+    const discoverSafely = () => {
+      try {
+        broadlink.discover();
+      } catch (error) {
+        log(`Broadlink discovery error: ${error.message || error}`);
+      }
+    };
+
+    discoverDevicesInterval = setInterval(discoverSafely, 2000);
 
     delayForDuration(deviceDiscoveryTimeout).then(() => {
-      clearInterval(this.discoverDevicesInterval);
+      clearInterval(discoverDevicesInterval);
+    }).catch((error) => {
+      log(`Broadlink discovery timer error: ${error.message || error}`);
     });
 
-    broadlink.discover();
+    discoverSafely();
   }
 
   broadlink.on('deviceReady', (device) => {
-    let macAddressParts, macAddress;
-    if (device.mac.includes(":")) {
-      macAddress = device.mac;
-    }else{
-      macAddressParts = device.mac.toString('hex').match(/[\s\S]{1,2}/g) || [];
-      macAddress = macAddressParts.join(':');
+    try {
+      let macAddressParts, macAddress;
+      if (device.mac.includes(":")) {
+        macAddress = device.mac;
+      }else{
+        macAddressParts = device.mac.toString('hex').match(/[\s\S]{1,2}/g) || [];
+        macAddress = macAddressParts.join(':');
+      }
+      device.host.macAddress = macAddress;
+
+      log(`\x1b[35m[INFO]\x1b[0m Discovered ${device.model} (${device.type.toString(16)}) at ${device.host.address} (${device.host.macAddress})`);
+      addDevice(device);
+
+      startPing(device, log);
+      startKeepAlive(device, log);
+    } catch (error) {
+      log(`Broadlink device registration error: ${error.message || error}`);
     }
-    device.host.macAddress = macAddress;
-
-    log(`\x1b[35m[INFO]\x1b[0m Discovered ${device.model} (${device.type.toString(16)}) at ${device.host.address} (${device.host.macAddress})`);
-    addDevice(device);
-
-    startPing(device, log);
-    startKeepAlive(device, log);
-  })
+  });
 }
 
 // Clear device registries between isolated unit tests. Production discovery is unchanged.
@@ -161,4 +173,4 @@ const getDevice = ({ host, log, learnOnly }) => {
   return device;
 }
 
-module.exports = { getDevice, discoverDevices, addDevice, resetDevices };
+module.exports = { getDevice, discoverDevices, addDevice, resetDevices, startPing };

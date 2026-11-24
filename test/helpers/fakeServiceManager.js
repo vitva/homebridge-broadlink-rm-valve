@@ -27,6 +27,12 @@ class FakeService {
     this.log = log
     this.name = name
     this.characteristics = {}
+    this.linkedServices = []
+  }
+
+  addLinkedService (service) {
+    this.linkedServices.push(service)
+    return this
   }
 
   setCharacteristic (type, value) {
@@ -81,6 +87,7 @@ class FakeCharacteristic {
   on (getSet, method) {
     if (getSet === 'get') {this.getMethod = method}
     if (getSet === 'set') {this.setMethod = method}
+    return this;
   }
 
   getValue () {
@@ -93,8 +100,9 @@ class FakeCharacteristic {
     })
   }
 
-  setProps () {
-    
+  setProps (props) {
+    this.props = { ...this.props, ...props };
+    return this;
   }
 }
 

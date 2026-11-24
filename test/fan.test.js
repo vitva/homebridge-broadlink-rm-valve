@@ -456,3 +456,81 @@ describe('fanAccessory', () => {
     expect(sentHexCodeCount).to.equal(0);
   });
 })
+
+const { Fanv1 } = require('../accessories');
+
+describe('fanv1Accessory HomeKit compatibility', () => {
+  it('uses the legacy On characteristic for power and automatic state changes', async () => {
+    const { device } = setup();
+    const fan = new Fanv1(null, {
+      ...defaultConfig,
+      host: device.host.address,
+      enableAutoOn: false,
+      enableAutoOff: false
+    }, 'FakeServiceManager');
+
+    fan.serviceManager.setCharacteristic(Characteristic.On, true);
+    await delayForDuration(0.1);
+    expect(fan.state.switchState).to.equal(true);
+    expect(device.hasSentCode('ON')).to.equal(true);
+
+    fan.serviceManager.setCharacteristic(Characteristic.On, false);
+    await delayForDuration(0.1);
+    expect(fan.state.switchState).to.equal(false);
+    expect(device.hasSentCode('OFF')).to.equal(true);
+  });
+
+  it('restores the previous cached speed when a fan power command fails', async () => {
+    const { device } = setup();
+    const fan = new Fanv1(null, {
+      ...defaultConfig,
+      host: device.host.address,
+      defaultSpeedStep: 2
+    }, 'FakeServiceManager');
+    const failure = new Error('simulated fan power send failure');
+    fan.state.switchState = true;
+    fan.lastFanSpeed = 30;
+    fan.performSend = async () => { throw failure; };
+
+    let result;
+    try {
+      await fan.setSwitchState('ON', false);
+    } catch (error) {
+      result = error;
+    }
+
+    expect(result).to.equal(failure);
+    expect(fan.lastFanSpeed).to.equal(30);
+  });
+
+  it('does not cache a requested speed when the Broadlink send fails', async () => {
+    const { device } = setup();
+    const fan = new Fanv1(null, {
+      ...defaultConfig,
+      host: device.host.address
+    }, 'FakeServiceManager');
+    const failure = new Error('simulated fan speed send failure');
+    fan.state.fanSpeed = 10;
+    fan.lastFanSpeed = 10;
+    fan.performSend = async () => { throw failure; };
+
+    const speed = fan.serviceManager.getCharacteristic(Characteristic.RotationSpeed);
+    const result = await new Promise(resolve => speed.setMethod(20, resolve));
+
+    expect(result).to.equal(failure);
+    expect(fan.state.fanSpeed).to.equal(10);
+    expect(fan.lastFanSpeed).to.equal(10);
+  });
+
+  it('uses a valid maxValue property for the legacy fan speed characteristic', () => {
+    const { device } = setup();
+    const fan = new Fanv1(null, {
+      ...defaultConfig,
+      host: device.host.address
+    }, 'FakeServiceManager');
+
+    const speed = fan.serviceManager.getCharacteristic(Characteristic.RotationSpeed);
+    expect(speed.props.maxValue).to.equal(100);
+    expect(speed.props.maxVlue).to.equal(undefined);
+  });
+});

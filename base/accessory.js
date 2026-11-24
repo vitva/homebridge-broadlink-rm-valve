@@ -92,16 +92,20 @@ class HomebridgeAccessory {
     callback();
   }
 
-  performSetValueAction({ host, data, log, name }) {
+  performSetValueAction({ host, data, log, name, logLevel }) {
     throw new Error('The "performSetValueAction" method must be overridden.');
   }
 
   async setCharacteristicValue(props, value, callback) {
     const { config, host, log, name, logLevel } = this;
+    let propertyName;
+    let previousValue;
+    let stateWasUpdated = false;
 
     try {
       const { delay, resendDataAfterReload, allowResend } = config;
-      const { service, propertyName, onData, offData, setValuePromise, ignorePreviousValue } = props;
+      const { service, onData, offData, setValuePromise, ignorePreviousValue } = props;
+      propertyName = props.propertyName;
 
       const capitalizedPropertyName = propertyName.charAt(0).toUpperCase() + propertyName.slice(1);
 
@@ -131,24 +135,32 @@ class HomebridgeAccessory {
         }
       }
 
-      let previousValue = this.state[propertyName];
+      previousValue = this.state[propertyName];
       if (this.isReloadingState && resendDataAfterReload) {
         previousValue = undefined
       }
 
       this.state[propertyName] = value;
+      stateWasUpdated = true;
 
       // Set toggle data if this is a toggle
       const data = value ? onData : offData;
 
       if (setValuePromise) {
-        setValuePromise(data, previousValue);
+        await setValuePromise(data, previousValue);
       } else if (data) {
-        this.performSetValueAction({ host, data, log, name });
+        await this.performSetValueAction({ host, data, log, name, logLevel });
       }
       callback(null);
     } catch (err) {
-      if (this.logLevel <= 4) {log('setCharacteristicValue error:', err.message)}
+      if (stateWasUpdated && propertyName) {
+        try {
+          this.state[propertyName] = previousValue;
+        } catch (rollbackError) {
+          if (this.logLevel <= 4) {log('setCharacteristicValue state rollback error:', rollbackError.message || rollbackError);}
+        }
+      }
+      if (this.logLevel <= 4) {log('setCharacteristicValue error:', err.message || err)}
       callback(err)
     }
   }

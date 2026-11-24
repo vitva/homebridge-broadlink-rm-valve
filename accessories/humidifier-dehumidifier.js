@@ -7,6 +7,7 @@ const delayForDuration = require('../helpers/delayForDuration');
 const ServiceManagerTypes = require('../helpers/serviceManagerTypes');
 const catchDelayCancelError = require('../helpers/catchDelayCancelError');
 const { getDevice } = require('../helpers/getDevice');
+const safeFilename = require('../helpers/safeFilename');
 const BroadlinkRMAccessory = require('./accessory');
 
 const FanAccessory = require('./fan');
@@ -20,12 +21,12 @@ class HumidifierDehumidifierAccessory extends FanAccessory {
 	  if(config.noHistory !== true) {
       this.displayName = config.name;
       this.lastUpdatedAt = undefined;
-      this.historyService = new HistoryService("room", this, { storage: 'fs', filename: 'RMPro_' + config.name.replace(' ','-') + '_persist.json'}); 
+      this.historyService = new HistoryService('room', this, { storage: 'fs', filename: `RMPro_${safeFilename(config.name)}_persist.json` }); 
       this.historyService.log = log;
     }
     
     this.humidityCallbackQueue = {};
-    this.monitorHumidity();
+    this.monitorHumidity().catch(error => this.log(`${this.name} monitorHumidity error: ${error.message || error}`));
   }
 
   setDefaults () {
@@ -49,11 +50,23 @@ class HumidifierDehumidifierAccessory extends FanAccessory {
     super.reset();
   }
   
-  async setSwitchState (hexData, previousValue){
-    this.previouslyOff = previousValue ? false : true;
-    this.updateDeviceState ();     
-    super.setSwitchState (hexData, previousValue);
-    super.checkAutoOnOff();
+  async setSwitchState (hexData, previousValue) {
+    const previousCurrentState = this.state.currentState;
+    const previousPreviouslyOff = this.previouslyOff;
+
+    try {
+      this.previouslyOff = previousValue ? false : true;
+      await this.updateDeviceState();
+      await super.setSwitchState(hexData, previousValue);
+      super.checkAutoOnOff();
+    } catch (error) {
+      this.previouslyOff = previousPreviouslyOff;
+      this.state.currentState = previousCurrentState;
+      if (previousCurrentState !== undefined) {
+        this.serviceManager.updateCharacteristic(Characteristic.CurrentHumidifierDehumidifierState, previousCurrentState);
+      }
+      throw error;
+    }
   }
   
   async setCurrentState (hexData, previousValue) {
@@ -78,8 +91,15 @@ class HumidifierDehumidifierAccessory extends FanAccessory {
     
     if (logLevel <=2) {log(`${name} setCurrentState: currently ${previousValue}, changing to ${state.currentState}`);}
 	  
-    if(hexData) {await this.performSend(hexData);}
-    serviceManager.updateCharacteristic(Characteristic.CurrentHumidifierDehumidifierState,state.currentState);
+    if (hexData) {
+      try {
+        await this.performSend(hexData);
+      } catch (error) {
+        state.currentState = previousValue;
+        throw error;
+      }
+    }
+    serviceManager.updateCharacteristic(Characteristic.CurrentHumidifierDehumidifierState, state.currentState);
     this.previouslyOff = false;
   }
   
@@ -93,7 +113,7 @@ class HumidifierDehumidifierAccessory extends FanAccessory {
     
     if (logLevel <=2) {log(`${name} setHumidifierThreshold: currently ${previousValue} to ${state.DehumidifierThreshold}, changing to ${state.HumidifierThreshold} to ${state.DehumidifierThreshold}`);}
     state.currentState = desiredState;
-    this.setCurrentState (hexData, previousState);
+    await this.setCurrentState(hexData, previousState);
   }
   
   async setDehumidifierThreshold (hexData, previousValue) {
@@ -106,7 +126,7 @@ class HumidifierDehumidifierAccessory extends FanAccessory {
     
     if (logLevel <=2) {log(`${name} setDeumidifierThreshold: currently ${state.HumidifierThreshold} to ${previousValue}, changing to ${state.HumidifierThreshold} to ${state.DehumidifierThreshold}`);}
     state.currentState = desiredState;
-    this.setCurrentState (hexData, previousState);
+    await this.setCurrentState(hexData, previousState);
   }
   
   getDesiredState () {
@@ -179,7 +199,7 @@ class HumidifierDehumidifierAccessory extends FanAccessory {
     if (logLevel <=1) {log(`\x1b[34m[DEBUG]\x1b[0m ${name} updateDeviceState: currently ${state.currentState}, changing to ${desiredState}`);}
 
     state.currentState = desiredState;
-    this.setCurrentState (null, previousState);
+    await this.setCurrentState(null, previousState);
     this.previouslyOff = false;
   }
 
@@ -197,8 +217,7 @@ class HumidifierDehumidifierAccessory extends FanAccessory {
     // Try again in a second if we don't have a device yet
     if (!device) {
       await delayForDuration(1);
-      this.monitorHumidity();
-      return;
+      return this.monitorHumidity();
     }
 
     if (logLevel <=1) {log(`\x1b[34m[DEBUG]\x1b[0m ${name} monitorHumidity`);}
@@ -231,7 +250,7 @@ class HumidifierDehumidifierAccessory extends FanAccessory {
       this.historyService.addEntry({ time: Math.round(new Date().valueOf() / 1000), humidity: this.state.currentHumidity });
     }
     
-    this.updateDeviceState();
+    this.updateDeviceState().catch(error => this.log(`${this.name} updateDeviceState error: ${error.message || error}`));
     this.processQueuedHumidityCallbacks(humidity);
   }
 
@@ -310,13 +329,12 @@ class HumidifierDehumidifierAccessory extends FanAccessory {
     if (logLevel <=1) {log(`\x1b[34m[DEBUG]\x1b[0m ${name} updateHumidityFromFile reading file: ${humidityFilePath}`);}
 
     fs.readFile(humidityFilePath, 'utf8', (err, data) => {
-      if (err) {
-        if (logLevel <=4) {log(`\x1b[31m[ERROR] \x1b[0m${name} updateHumidityFromFile\n\n${err.message}`);}
-      }
-
-      if (data === undefined || data.trim().length === 0) {
-        if (logLevel <=3) {log(`\x1b[33m[WARNING]\x1b[0m ${name} updateHumidityFromFile error reading file: ${humidityFilePath}, using previous Temperature`);}
+      if (err || typeof data !== 'string' || data.trim().length === 0) {
+        if (err && logLevel <=4) {log(`\x1b[31m[ERROR] \x1b[0m${name} updateHumidityFromFile\n\n${err.message}`);}
+        if (logLevel <=3) {log(`\x1b[33m[WARNING]\x1b[0m ${name} updateHumidityFromFile error reading file: ${humidityFilePath}, using previous humidity`);}
         humidity = (state.currentHumidity || 0);
+        this.onHumidity(temperature, humidity);
+        return;
       }
 
       const lines = data.split(/\r?\n/);

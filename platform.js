@@ -45,17 +45,37 @@ const BroadlinkRMPlatform = class extends HomebridgePlatform {
   addAccessories (accessories) {
     const { config, log, logLevel } = this;
 
-    this.discoverBroadlinkDevices();
+    if (config.accessories === undefined) {config.accessories = [];}
+    let configuredAccessories;
+    try {
+      configuredAccessories = filterConfiguredAccessories(config.accessories, log, logLevel);
+    } catch (error) {
+      log(`[CONFIG ERROR] Invalid accessories configuration: ${error.message || error}`);
+      return;
+    }
+    const activeAccessories = configuredAccessories.filter((accessory) => accessory.type && classTypes[accessory.type] && !accessory.disabled);
+
+    // Verified by Homebridge requires the plugin to remain idle until configured.
+    // Do not discover devices or publish the built-in learning accessories for an empty config.
+    if (activeAccessories.length === 0) {
+      if (logLevel <= 2) {log('No enabled accessories are configured; Broadlink RM platform will remain idle.');}
+      return;
+    }
+
+    try {
+      this.discoverBroadlinkDevices();
+    } catch (error) {
+      log(`[CONFIG ERROR] Broadlink device discovery could not be configured: ${error.message || error}`);
+    }
     this.showMessage();
     if (!config.isUnitTest) {
       setTimeout(() => checkForUpdates(log), 1800);
     }
 
-    if (config.accessories === undefined) {config.accessories = [];}
-    const configuredAccessories = filterConfiguredAccessories(config.accessories, log, logLevel);
-
     // Add a Learn Code accessory if none exist in the config
-    const learnIRAccessories = configuredAccessories.filter((accessory) => (accessory.type === 'learn-ir' || accessory.type === 'learn-code'));
+    const learnIRAccessories = configuredAccessories.filter((accessory) =>
+      !accessory.disabled && (accessory.type === 'learn-ir' || accessory.type === 'learn-code')
+    );
 
     if (learnIRAccessories.length === 0) {
 
@@ -73,11 +93,23 @@ const BroadlinkRMPlatform = class extends HomebridgePlatform {
     // Iterate through the config accessories
     const tvs = [];
     configuredAccessories.forEach((accessory) => {
-      if (!accessory.type) {throw new Error(`Each accessory must be configured with a "type". e.g. "switch"`);}
       if (accessory.disabled) {return;}
-      if (!classTypes[accessory.type]) {throw new Error(`homebridge-broadlink-rm-valve doesn't support accessories of type "${accessory.type}".`);}
+      if (!accessory.type) {
+        log(`[CONFIG ERROR] Skipping accessory "${accessory.name || 'unnamed'}": an accessory type is required.`);
+        return;
+      }
+      if (!classTypes[accessory.type]) {
+        log(`[CONFIG ERROR] Skipping accessory "${accessory.name || 'unnamed'}": unsupported type "${accessory.type}".`);
+        return;
+      }
 
-      const homeKitAccessory = new classTypes[accessory.type](log, accessory);
+      let homeKitAccessory;
+      try {
+        homeKitAccessory = new classTypes[accessory.type](log, accessory);
+      } catch (error) {
+        log(`[CONFIG ERROR] Could not initialize accessory "${accessory.name || accessory.type}": ${error.message || error}`);
+        return;
+      }
 
       if (classTypes[accessory.type] === classTypes.tv) {
         const tvSubType = (accessory.subType || 'tv').toLowerCase();

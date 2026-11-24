@@ -11,14 +11,18 @@ const options = {
 };
 
 const checkForUpdates = (log) => {
-  versionCheck(options, (error, update) => {
-    if (error) {
-      return;
-    }
-    if (update) {
-      log(`\x1b[32m[UPDATE AVAILABLE] \x1b[0mVersion ${update.name} of Homebridge Broadlink RM Pro + Valve is available. The release notes can be found here: \x1b[4mhttps://github.com/${options.owner}/${options.repo}/releases/\x1b[0m`);
-    }
-  });
+  try {
+    versionCheck(options, (error, update) => {
+      if (error) {
+        return;
+      }
+      if (update) {
+        log(`\x1b[32m[UPDATE AVAILABLE] \x1b[0mVersion ${update.name} of Homebridge Broadlink RM Pro + Valve is available. The release notes can be found here: \x1b[4mhttps://github.com/${options.owner}/${options.repo}/releases/\x1b[0m`);
+      }
+    });
+  } catch (error) {
+    if (log) {log(`Homebridge Broadlink RM update check failed: ${error.message || error}`);}
+  }
 };
 
 module.exports = checkForUpdates;

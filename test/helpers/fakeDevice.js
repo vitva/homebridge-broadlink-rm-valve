@@ -1,8 +1,10 @@
 const uuid = require('uuid')
+const EventEmitter = require('events')
 
-class FakeDevice {
+class FakeDevice extends EventEmitter {
 
   constructor () {
+    super()
     const identifier = uuid.v4()
 
     this.host = {
@@ -53,6 +55,31 @@ class FakeDevice {
 
   on (type, callback) {
     this.callbacks[type] = callback;
+    return super.on(type, callback);
+  }
+
+  enterLearning () {
+    if (this.learningError) {throw this.learningError;}
+  }
+
+  enterRFSweep () {
+    if (this.rfSweepError) {throw this.rfSweepError;}
+  }
+
+  checkData () {
+    if (this.checkDataError) {throw this.checkDataError;}
+  }
+
+  checkRFData () {
+    if (this.checkRFDataError) {throw this.checkRFDataError;}
+  }
+
+  checkRFData2 () {
+    if (this.checkRFData2Error) {throw this.checkRFData2Error;}
+  }
+
+  cancelLearn () {
+    if (this.cancelLearnError) {throw this.cancelLearnError;}
   }
 
   sendFakeOnCallback (type, value) {

@@ -4,9 +4,8 @@ const FanAccessory = require('./fan');
 class AirPurifierAccessory extends FanAccessory {
 
   async setSwitchState (hexData, previousValue) {
-    super.setSwitchState(hexData, previousValue);
-    
-    this.updateCurrentState()
+    await super.setSwitchState(hexData, previousValue);
+    this.updateCurrentState();
   }
 
   // User requested a the target state be set
@@ -25,7 +24,7 @@ class AirPurifierAccessory extends FanAccessory {
   updateCurrentState() {
     const { log, name, state, serviceManager } = this;
 
-    if (state.switchState === true) {
+    if (state.switchState) {
       log(`${name} updateCurrentState: changing to purifying`);
       state.currentState = Characteristic.CurrentAirPurifierState.PURIFYING_AIR
     } else {
@@ -68,13 +67,12 @@ class AirPurifierAccessory extends FanAccessory {
       }
     });
 
-    this.serviceManager.addToggleCharacteristic({
+    this.serviceManager.addGetCharacteristic({
       name: 'currentState',
       type: Characteristic.CurrentAirPurifierState,
-      getMethod: this.getCharacteristicValue,
-      setMethod: this.setCharacteristicValue,
+      method: this.getCharacteristicValue,
       bind: this,
-      props: { }
+      props: {}
     });
 
     this.serviceManager.addToggleCharacteristic({
