@@ -185,6 +185,12 @@ class HumidifierDehumidifierAccessory extends FanAccessory {
 
   // Device Temperature Methods
   async monitorHumidity () {
+    if (this.testMode) {
+      if (state.currentHumidity === undefined) {state.currentHumidity = 50;}
+      this.updateHumidityUI();
+      return;
+    }
+
     const { logLevel, config, host, log, name, state } = this;
     const device = getDevice({ host, log });
 	  
