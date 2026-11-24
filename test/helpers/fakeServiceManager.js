@@ -81,6 +81,7 @@ class FakeCharacteristic {
   on (getSet, method) {
     if (getSet === 'get') {this.getMethod = method}
     if (getSet === 'set') {this.setMethod = method}
+    return this;
   }
 
   getValue () {
