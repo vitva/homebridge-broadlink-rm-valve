@@ -93,8 +93,9 @@ class FakeCharacteristic {
     })
   }
 
-  setProps () {
-    
+  setProps (props) {
+    this.props = { ...this.props, ...props };
+    return this;
   }
 }
 
