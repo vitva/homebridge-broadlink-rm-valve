@@ -40,7 +40,7 @@ const expectedTypes = [
   'heater-cooler',
   'valve'
 ];
-expectedTypes.forEach(type => assert.ok(supportedTypes.includes(type), `Missing UI accessory type: ${type}`));
+assert.deepEqual(supportedTypes, expectedTypes, 'The original accessory type order must be preserved and Valve appended');
 
 assert.ok(accessoryProperties.data.properties.open);
 assert.ok(accessoryProperties.data.properties.close);
@@ -76,5 +76,34 @@ assert.ok(accessoryProperties.data.properties.close.condition);
 assert.ok(accessoryProperties.subType.condition);
 assert.ok(accessoryProperties.debug);
 assert.ok(accessoryProperties.resendHexAfterReload);
+
+const expectedAccessorySettings = [
+  'delay', 'allowResend', 'persistState', 'enableAutoOff', 'onDuration',
+  'enableAutoOn', 'offDuration', 'defaultBrightness', 'useLastKnownBrightness',
+  'defaultFanSpeed', 'speedSteps', 'showSwingMode', 'totalDurationOpen',
+  'totalDurationClose', 'openCloseDuration', 'lockDuration', 'unlockDuration',
+  'autoLockDelay', 'pingIPAddress', 'mqttURL', 'mqttTopic', 'temperatureAdjustment',
+  'humidityAdjustment', 'minTemperature', 'maxTemperature', 'tempStepSize',
+  'heatOnly', 'coolOnly', 'defaultCoolTemperature', 'defaultHeatTemperature',
+  'humidifierOnly', 'deHumidifierOnly', 'batteryAlerts', 'w1Device',
+  'defaultMode', 'coolingThresholdTemperature', 'heatingThresholdTemperature',
+  'autoCoolTemperature', 'autoHeatTemperature', 'autoMinimumDuration',
+  'sendOnWhenOff', 'autoSwitchName', 'lockUnlockDuration'
+];
+expectedAccessorySettings.forEach(key => assert.ok(accessoryProperties[key], `Missing accessory setting: ${key}`));
+
+const expectedCommandSettings = [
+  'swingToggle', 'fanSpeed10', 'fanSpeed100', 'brightness10', 'brightness100',
+  'hue0', 'hue99', 'hue199', 'hue299', 'hue359', 'white',
+  'targetStateHumidifier', 'targetStateDehumidifier', 'fanOnly',
+  'lockControls', 'unlockControls', 'remote', 'volume', 'inputs', 'powerMode'
+];
+expectedCommandSettings.forEach(key => assert.ok(accessoryProperties.data.properties[key], `Missing command setting: data.${key}`));
+assert.equal(accessoryProperties.data.additionalProperties, true);
+assert.equal(accessoryProperties.additionalProperties, true);
+assert.ok(accessoryProperties.data.properties.remote.properties.arrowUp);
+assert.ok(accessoryProperties.data.properties.inputs.items.properties.data);
+assert.ok(accessoryProperties.data.properties.cool.properties.temperatureCodes);
+assert.ok(accessoryProperties.data.properties.heat.properties.temperatureCodes);
 
 console.log('PASS: Homebridge Config UI schema exposes all legacy accessory types and type-specific commands');

@@ -3,7 +3,7 @@
   "pluginType": "platform",
   "singular": true,
   "headerDisplay": "Настройка Broadlink RM для Homebridge. Добавляйте аксессуары в список ниже. Для обучения ИК-команд используйте аксессуар **Learn**, который плагин добавляет автоматически. [Инструкция и примеры](https://github.com/vitva/homebridge-broadlink-rm-valve#readme).",
-  "footerDisplay": "**Кран:** укажите две независимые HEX-команды — открыть и закрыть. Для гаражных ворот и жалюзи также доступны отдельные команды открытия/закрытия; для замков — блокировки/разблокировки. Broadlink не подтверждает физическое положение исполнительного устройства: HomeKit отображает состояние по последней переданной Broadlink-команде. Сложные последовательности, повторы и паузы доступны в JSON Config.",
+  "footerDisplay": "**Важно:** все исходные типы аксессуаров сохранены. После выбора типа показываются относящиеся к нему параметры и команды. Для нестандартных динамических карт команд, сложных массивов повторов/пауз и температурных таблиц используйте JSON Config — формат оригинального плагина сохранён. **Кран:** отдельные команды открытия и закрытия; HomeKit показывает последнее отправленное состояние, а не подтверждённое физическое положение.",
   "schema": {
     "type": "object",
     "properties": {
@@ -134,60 +134,6 @@
               "required": true,
               "oneOf": [
                 {
-                  "title": "Кран (Valve)",
-                  "enum": [
-                    "valve"
-                  ]
-                },
-                {
-                  "title": "Выключатель",
-                  "enum": [
-                    "switch"
-                  ]
-                },
-                {
-                  "title": "Мультивыключатель",
-                  "enum": [
-                    "switch-multi"
-                  ]
-                },
-                {
-                  "title": "Выключатель с повтором",
-                  "enum": [
-                    "switch-repeat"
-                  ]
-                },
-                {
-                  "title": "Мультивыключатель с повтором",
-                  "enum": [
-                    "switch-multi-repeat"
-                  ]
-                },
-                {
-                  "title": "Розетка",
-                  "enum": [
-                    "outlet"
-                  ]
-                },
-                {
-                  "title": "Свет",
-                  "enum": [
-                    "light"
-                  ]
-                },
-                {
-                  "title": "Вентилятор",
-                  "enum": [
-                    "fan"
-                  ]
-                },
-                {
-                  "title": "Вентилятор (старый)",
-                  "enum": [
-                    "fanv1"
-                  ]
-                },
-                {
                   "title": "Кондиционер",
                   "enum": [
                     "air-conditioner"
@@ -206,15 +152,21 @@
                   ]
                 },
                 {
-                  "title": "Датчик температуры",
+                  "title": "Обучение ИК-командам",
                   "enum": [
-                    "temperatureSensor"
+                    "learn-ir"
                   ]
                 },
                 {
-                  "title": "Датчик влажности",
+                  "title": "Обучение коду",
                   "enum": [
-                    "humiditySensor"
+                    "learn-code"
+                  ]
+                },
+                {
+                  "title": "Выключатель",
+                  "enum": [
+                    "switch"
                   ]
                 },
                 {
@@ -227,6 +179,48 @@
                   "title": "Замок",
                   "enum": [
                     "lock"
+                  ]
+                },
+                {
+                  "title": "Мультивыключатель",
+                  "enum": [
+                    "switch-multi"
+                  ]
+                },
+                {
+                  "title": "Мультивыключатель с повтором",
+                  "enum": [
+                    "switch-multi-repeat"
+                  ]
+                },
+                {
+                  "title": "Выключатель с повтором",
+                  "enum": [
+                    "switch-repeat"
+                  ]
+                },
+                {
+                  "title": "Вентилятор",
+                  "enum": [
+                    "fan"
+                  ]
+                },
+                {
+                  "title": "Вентилятор (старый)",
+                  "enum": [
+                    "fanv1"
+                  ]
+                },
+                {
+                  "title": "Розетка",
+                  "enum": [
+                    "outlet"
+                  ]
+                },
+                {
+                  "title": "Свет",
+                  "enum": [
+                    "light"
                   ]
                 },
                 {
@@ -248,21 +242,27 @@
                   ]
                 },
                 {
+                  "title": "Датчик температуры",
+                  "enum": [
+                    "temperatureSensor"
+                  ]
+                },
+                {
+                  "title": "Датчик влажности",
+                  "enum": [
+                    "humiditySensor"
+                  ]
+                },
+                {
                   "title": "Обогреватель/охладитель",
                   "enum": [
                     "heater-cooler"
                   ]
                 },
                 {
-                  "title": "Обучение ИК-командам",
+                  "title": "Кран (Valve)",
                   "enum": [
-                    "learn-ir"
-                  ]
-                },
-                {
-                  "title": "Обучение коду",
-                  "enum": [
-                    "learn-code"
+                    "valve"
                   ]
                 }
               ]
@@ -281,7 +281,10 @@
               "title": "Разрешить недоверенный TLS-сертификат MQTT",
               "type": "boolean",
               "default": false,
-              "description": "Только для MQTT-брокеров с самоподписанным или недоверенным сертификатом. Снижает безопасность соединения; по умолчанию проверка сертификата включена."
+              "description": "Только для брокеров с самоподписанным сертификатом. Отключает проверку сертификата.",
+              "condition": {
+                "functionBody": "return [\"switch\",\"switch-multi\",\"switch-multi-repeat\",\"switch-repeat\",\"outlet\",\"light\",\"fan\",\"fanv1\",\"air-conditioner\",\"air-purifier\",\"humidifier-dehumidifier\",\"temperatureSensor\",\"humiditySensor\",\"garage-door-opener\",\"lock\",\"window\",\"window-covering\",\"tv\",\"heater-cooler\",\"valve\",\"learn-ir\",\"learn-code\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
             },
             "valveType": {
               "title": "Тип крана HomeKit",
@@ -354,6 +357,408 @@
                   "condition": {
                     "functionBody": "return ['lock', 'garage-door-opener'].includes(model.accessories?.[arrayIndices]?.type);"
                   }
+                },
+                "swingToggle": {
+                  "title": "Переключить качание (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"fan\",\"fanv1\",\"air-purifier\",\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "fanSpeed10": {
+                  "title": "Скорость вентилятора 10% (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"fan\",\"fanv1\",\"air-purifier\",\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "fanSpeed20": {
+                  "title": "Скорость вентилятора 20% (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"fan\",\"fanv1\",\"air-purifier\",\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "fanSpeed30": {
+                  "title": "Скорость вентилятора 30% (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"fan\",\"fanv1\",\"air-purifier\",\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "fanSpeed40": {
+                  "title": "Скорость вентилятора 40% (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"fan\",\"fanv1\",\"air-purifier\",\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "fanSpeed50": {
+                  "title": "Скорость вентилятора 50% (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"fan\",\"fanv1\",\"air-purifier\",\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "fanSpeed60": {
+                  "title": "Скорость вентилятора 60% (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"fan\",\"fanv1\",\"air-purifier\",\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "fanSpeed70": {
+                  "title": "Скорость вентилятора 70% (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"fan\",\"fanv1\",\"air-purifier\",\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "fanSpeed80": {
+                  "title": "Скорость вентилятора 80% (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"fan\",\"fanv1\",\"air-purifier\",\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "fanSpeed90": {
+                  "title": "Скорость вентилятора 90% (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"fan\",\"fanv1\",\"air-purifier\",\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "fanSpeed100": {
+                  "title": "Скорость вентилятора 100% (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"fan\",\"fanv1\",\"air-purifier\",\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "brightness10": {
+                  "title": "Яркость 10% (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"light\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "brightness20": {
+                  "title": "Яркость 20% (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"light\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "brightness30": {
+                  "title": "Яркость 30% (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"light\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "brightness40": {
+                  "title": "Яркость 40% (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"light\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "brightness50": {
+                  "title": "Яркость 50% (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"light\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "brightness60": {
+                  "title": "Яркость 60% (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"light\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "brightness70": {
+                  "title": "Яркость 70% (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"light\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "brightness80": {
+                  "title": "Яркость 80% (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"light\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "brightness90": {
+                  "title": "Яркость 90% (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"light\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "brightness100": {
+                  "title": "Яркость 100% (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"light\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "hue0": {
+                  "title": "Цветовой тон 0° (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"light\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "hue99": {
+                  "title": "Цветовой тон 99° (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"light\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "hue199": {
+                  "title": "Цветовой тон 199° (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"light\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "hue299": {
+                  "title": "Цветовой тон 299° (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"light\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "hue359": {
+                  "title": "Цветовой тон 359° (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"light\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "white": {
+                  "title": "Белый свет (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"light\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "targetStateHumidifier": {
+                  "title": "Режим увлажнения (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "targetStateDehumidifier": {
+                  "title": "Режим осушения (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "fanOnly": {
+                  "title": "Только вентиляция (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "lockControls": {
+                  "title": "Заблокировать физические кнопки (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "unlockControls": {
+                  "title": "Разблокировать физические кнопки (HEX)",
+                  "type": "string",
+                  "condition": {
+                    "functionBody": "return [\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+                  }
+                },
+                "remote": {
+                  "title": "Команды пульта телевизора",
+                  "type": "object",
+                  "properties": {
+                    "select": {
+                      "title": "Выбор (HEX)",
+                      "type": "string"
+                    },
+                    "arrowUp": {
+                      "title": "Вверх (HEX)",
+                      "type": "string"
+                    },
+                    "arrowDown": {
+                      "title": "Вниз (HEX)",
+                      "type": "string"
+                    },
+                    "arrowLeft": {
+                      "title": "Влево (HEX)",
+                      "type": "string"
+                    },
+                    "arrowRight": {
+                      "title": "Вправо (HEX)",
+                      "type": "string"
+                    },
+                    "back": {
+                      "title": "Назад (HEX)",
+                      "type": "string"
+                    },
+                    "exit": {
+                      "title": "Выход (HEX)",
+                      "type": "string"
+                    },
+                    "playPause": {
+                      "title": "Воспроизведение/пауза (HEX)",
+                      "type": "string"
+                    },
+                    "info": {
+                      "title": "Информация (HEX)",
+                      "type": "string"
+                    },
+                    "rewind": {
+                      "title": "Перемотка назад (HEX)",
+                      "type": "string"
+                    },
+                    "fastForward": {
+                      "title": "Перемотка вперёд (HEX)",
+                      "type": "string"
+                    },
+                    "nextTrack": {
+                      "title": "Следующий трек (HEX)",
+                      "type": "string"
+                    },
+                    "previousTrack": {
+                      "title": "Предыдущий трек (HEX)",
+                      "type": "string"
+                    }
+                  },
+                  "condition": {
+                    "functionBody": "return model.accessories?.[arrayIndices]?.type === 'tv';"
+                  }
+                },
+                "volume": {
+                  "title": "Команды громкости телевизора",
+                  "type": "object",
+                  "properties": {
+                    "up": {
+                      "title": "Громкость + (HEX)",
+                      "type": "string"
+                    },
+                    "down": {
+                      "title": "Громкость − (HEX)",
+                      "type": "string"
+                    }
+                  },
+                  "condition": {
+                    "functionBody": "return model.accessories?.[arrayIndices]?.type === 'tv';"
+                  }
+                },
+                "powerMode": {
+                  "title": "Состояние питания телевизора",
+                  "type": "object",
+                  "properties": {
+                    "show": {
+                      "title": "Показать меню питания (HEX)",
+                      "type": "string"
+                    }
+                  },
+                  "condition": {
+                    "functionBody": "return model.accessories?.[arrayIndices]?.type === 'tv';"
+                  }
+                },
+                "inputs": {
+                  "title": "Входы телевизора",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "title": "Название входа",
+                        "type": "string",
+                        "required": true
+                      },
+                      "type": {
+                        "title": "Тип входа",
+                        "type": "string",
+                        "oneOf": [
+                          {
+                            "title": "HDMI",
+                            "enum": [
+                              "hdmi"
+                            ]
+                          },
+                          {
+                            "title": "Другой",
+                            "enum": [
+                              "other"
+                            ]
+                          }
+                        ]
+                      },
+                      "data": {
+                        "title": "Команда выбора (HEX)",
+                        "type": "string",
+                        "required": true
+                      }
+                    }
+                  },
+                  "condition": {
+                    "functionBody": "return model.accessories?.[arrayIndices]?.type === 'tv';"
+                  }
+                },
+                "additionalProperties": true,
+                "cool": {
+                  "title": "Команды охлаждения",
+                  "type": "object",
+                  "properties": {
+                    "on": {
+                      "title": "Включить режим (HEX)",
+                      "type": "string"
+                    },
+                    "off": {
+                      "title": "Выключить режим (HEX)",
+                      "type": "string"
+                    },
+                    "temperatureCodes": {
+                      "title": "Коды температуры и скорости",
+                      "type": "object",
+                      "additionalProperties": true
+                    }
+                  },
+                  "additionalProperties": true,
+                  "condition": {
+                    "functionBody": "return model.accessories?.[arrayIndices]?.type === 'heater-cooler';"
+                  }
+                },
+                "heat": {
+                  "title": "Команды нагрева",
+                  "type": "object",
+                  "properties": {
+                    "on": {
+                      "title": "Включить режим (HEX)",
+                      "type": "string"
+                    },
+                    "off": {
+                      "title": "Выключить режим (HEX)",
+                      "type": "string"
+                    },
+                    "temperatureCodes": {
+                      "title": "Коды температуры и скорости",
+                      "type": "object",
+                      "additionalProperties": true
+                    }
+                  },
+                  "additionalProperties": true,
+                  "condition": {
+                    "functionBody": "return model.accessories?.[arrayIndices]?.type === 'heater-cooler';"
+                  }
                 }
               },
               "additionalProperties": true,
@@ -364,7 +769,6 @@
             "subType": {
               "title": "Категория телевизора HomeKit",
               "type": "string",
-              "description": "Подкатегория внешнего телевизора. Если не задавать, сохраняется исходное поведение плагина.",
               "oneOf": [
                 {
                   "title": "Приставка (STB)",
@@ -386,7 +790,7 @@
                 }
               ],
               "condition": {
-                "functionBody": "return model.accessories?.[arrayIndices]?.type === 'tv';"
+                "functionBody": "return [\"tv\"].includes(model.accessories?.[arrayIndices]?.type);"
               }
             },
             "debug": {
@@ -400,6 +804,723 @@
               "type": "boolean",
               "default": false,
               "description": "Для совместимости с исходным плагином. Используйте осторожно для исполнительных устройств."
+            },
+            "delay": {
+              "title": "Задержка перед командой (секунды)",
+              "type": "number",
+              "minimum": 0,
+              "condition": {
+                "functionBody": "return [\"switch\",\"switch-multi\",\"switch-multi-repeat\",\"switch-repeat\",\"outlet\",\"light\",\"fan\",\"fanv1\",\"air-conditioner\",\"air-purifier\",\"humidifier-dehumidifier\",\"temperatureSensor\",\"humiditySensor\",\"garage-door-opener\",\"lock\",\"window\",\"window-covering\",\"tv\",\"heater-cooler\",\"valve\",\"learn-ir\",\"learn-code\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "allowResend": {
+              "title": "Повторно отправлять одинаковую команду",
+              "type": "boolean",
+              "description": "По умолчанию одинаковые команды не отправляются повторно; включите, если устройству нужен повтор.",
+              "condition": {
+                "functionBody": "return [\"switch\",\"switch-multi\",\"switch-multi-repeat\",\"switch-repeat\",\"outlet\",\"light\",\"fan\",\"fanv1\",\"air-conditioner\",\"air-purifier\",\"humidifier-dehumidifier\",\"temperatureSensor\",\"humiditySensor\",\"garage-door-opener\",\"lock\",\"window\",\"window-covering\",\"tv\",\"heater-cooler\",\"valve\",\"learn-ir\",\"learn-code\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "preventResendHex": {
+              "title": "Не повторять одинаковые HEX-команды",
+              "type": "boolean",
+              "description": "Совместимый параметр; имеет приоритет над allowResend, если задан.",
+              "condition": {
+                "functionBody": "return [\"switch\",\"switch-multi\",\"switch-multi-repeat\",\"switch-repeat\",\"outlet\",\"light\",\"fan\",\"fanv1\",\"air-conditioner\",\"air-purifier\",\"humidifier-dehumidifier\",\"temperatureSensor\",\"humiditySensor\",\"garage-door-opener\",\"lock\",\"window\",\"window-covering\",\"tv\",\"heater-cooler\",\"valve\",\"learn-ir\",\"learn-code\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "persistState": {
+              "title": "Сохранять состояние аксессуара",
+              "type": "boolean",
+              "default": true,
+              "condition": {
+                "functionBody": "return [\"switch\",\"switch-multi\",\"switch-multi-repeat\",\"switch-repeat\",\"outlet\",\"light\",\"fan\",\"fanv1\",\"air-conditioner\",\"air-purifier\",\"humidifier-dehumidifier\",\"temperatureSensor\",\"humiditySensor\",\"garage-door-opener\",\"lock\",\"window\",\"window-covering\",\"tv\",\"heater-cooler\",\"valve\",\"learn-ir\",\"learn-code\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "noHistory": {
+              "title": "Отключить историю Eve",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"air-conditioner\",\"humidifier-dehumidifier\",\"heater-cooler\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "disableLogs": {
+              "title": "Отключить журнал для аксессуара",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"switch\",\"switch-multi\",\"switch-multi-repeat\",\"switch-repeat\",\"outlet\",\"light\",\"fan\",\"fanv1\",\"air-conditioner\",\"air-purifier\",\"humidifier-dehumidifier\",\"temperatureSensor\",\"humiditySensor\",\"garage-door-opener\",\"lock\",\"window\",\"window-covering\",\"tv\",\"heater-cooler\",\"valve\",\"learn-ir\",\"learn-code\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "logLevel": {
+              "title": "Уровень журнала аксессуара",
+              "type": "string",
+              "oneOf": [
+                {
+                  "title": "none",
+                  "enum": [
+                    "none"
+                  ]
+                },
+                {
+                  "title": "critical",
+                  "enum": [
+                    "critical"
+                  ]
+                },
+                {
+                  "title": "error",
+                  "enum": [
+                    "error"
+                  ]
+                },
+                {
+                  "title": "warning",
+                  "enum": [
+                    "warning"
+                  ]
+                },
+                {
+                  "title": "info",
+                  "enum": [
+                    "info"
+                  ]
+                },
+                {
+                  "title": "debug",
+                  "enum": [
+                    "debug"
+                  ]
+                },
+                {
+                  "title": "trace",
+                  "enum": [
+                    "trace"
+                  ]
+                }
+              ],
+              "condition": {
+                "functionBody": "return [\"switch\",\"switch-multi\",\"switch-multi-repeat\",\"switch-repeat\",\"outlet\",\"light\",\"fan\",\"fanv1\",\"air-conditioner\",\"air-purifier\",\"humidifier-dehumidifier\",\"temperatureSensor\",\"humiditySensor\",\"garage-door-opener\",\"lock\",\"window\",\"window-covering\",\"tv\",\"heater-cooler\",\"valve\",\"learn-ir\",\"learn-code\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "resendDataAfterReload": {
+              "title": "Повторить последнее состояние после перезапуска",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"switch\",\"switch-multi\",\"switch-multi-repeat\",\"switch-repeat\",\"outlet\",\"light\",\"fan\",\"fanv1\",\"air-conditioner\",\"air-purifier\",\"humidifier-dehumidifier\",\"temperatureSensor\",\"humiditySensor\",\"garage-door-opener\",\"lock\",\"window\",\"window-covering\",\"tv\",\"heater-cooler\",\"valve\",\"learn-ir\",\"learn-code\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "resendDataAfterReloadDelay": {
+              "title": "Задержка повторной отправки (секунды)",
+              "type": "number",
+              "minimum": 0,
+              "condition": {
+                "functionBody": "return [\"switch\",\"switch-multi\",\"switch-multi-repeat\",\"switch-repeat\",\"outlet\",\"light\",\"fan\",\"fanv1\",\"air-conditioner\",\"air-purifier\",\"humidifier-dehumidifier\",\"temperatureSensor\",\"humiditySensor\",\"garage-door-opener\",\"lock\",\"window\",\"window-covering\",\"tv\",\"heater-cooler\",\"valve\",\"learn-ir\",\"learn-code\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "enableAutoOff": {
+              "title": "Автоматически выключать",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"switch\",\"switch-repeat\",\"switch-multi\",\"switch-multi-repeat\",\"outlet\",\"light\",\"fan\",\"fanv1\",\"tv\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "onDuration": {
+              "title": "Время до автоматического выключения (секунды)",
+              "type": "number",
+              "minimum": 0,
+              "condition": {
+                "functionBody": "return [\"switch\",\"switch-repeat\",\"switch-multi\",\"switch-multi-repeat\",\"outlet\",\"light\",\"fan\",\"fanv1\",\"tv\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "enableAutoOn": {
+              "title": "Автоматически включать",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"switch\",\"switch-repeat\",\"switch-multi\",\"switch-multi-repeat\",\"outlet\",\"tv\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "offDuration": {
+              "title": "Время до автоматического включения (секунды)",
+              "type": "number",
+              "minimum": 0,
+              "condition": {
+                "functionBody": "return [\"switch\",\"switch-repeat\",\"switch-multi\",\"switch-multi-repeat\",\"outlet\",\"tv\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "stateless": {
+              "title": "Режим без сохранения состояния",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"switch\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "defaultBrightness": {
+              "title": "Яркость по умолчанию (%)",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100,
+              "condition": {
+                "functionBody": "return [\"light\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "useLastKnownBrightness": {
+              "title": "Использовать последнюю известную яркость",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"light\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "onDelay": {
+              "title": "Задержка включения света (секунды)",
+              "type": "number",
+              "minimum": 0,
+              "condition": {
+                "functionBody": "return [\"light\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "defaultFanSpeed": {
+              "title": "Скорость вентилятора по умолчанию (%)",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100,
+              "condition": {
+                "functionBody": "return [\"fan\",\"fanv1\",\"air-purifier\",\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "defaultSpeedStep": {
+              "title": "Шаг скорости по умолчанию",
+              "type": "integer",
+              "minimum": 1,
+              "condition": {
+                "functionBody": "return [\"fan\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "stepSize": {
+              "title": "Размер шага скорости/влажности",
+              "type": "number",
+              "minimum": 0,
+              "condition": {
+                "functionBody": "return [\"fan\",\"fanv1\",\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "speedSteps": {
+              "title": "Количество шагов скорости",
+              "type": "integer",
+              "minimum": 1,
+              "condition": {
+                "functionBody": "return [\"fan\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "speedCycle": {
+              "title": "Циклические значения скорости",
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "condition": {
+                "functionBody": "return [\"fan\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "alwaysResetToDefaults": {
+              "title": "Сбрасывать параметры вентилятора к значениям по умолчанию",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"fan\",\"fanv1\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "showSwingMode": {
+              "title": "Показывать режим качания",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"fan\",\"air-purifier\",\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "hideSwingMode": {
+              "title": "Скрыть режим качания",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"fan\",\"air-purifier\",\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "showRotationDirection": {
+              "title": "Показывать направление вращения",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"fan\",\"fanv1\",\"air-purifier\",\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "hideRotationDirection": {
+              "title": "Скрыть направление вращения",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"fan\",\"air-purifier\",\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "showLockPhysicalControls": {
+              "title": "Показывать блокировку физических кнопок",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"air-purifier\",\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "totalDurationOpen": {
+              "title": "Время полного открытия (секунды)",
+              "type": "number",
+              "minimum": 0,
+              "condition": {
+                "functionBody": "return [\"window-covering\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "totalDurationClose": {
+              "title": "Время полного закрытия (секунды)",
+              "type": "number",
+              "minimum": 0,
+              "condition": {
+                "functionBody": "return [\"window-covering\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "initialDelay": {
+              "title": "Начальная задержка движения (секунды)",
+              "type": "number",
+              "minimum": 0,
+              "condition": {
+                "functionBody": "return [\"window-covering\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "openCloseDuration": {
+              "title": "Время движения двери (секунды)",
+              "type": "number",
+              "minimum": 0,
+              "condition": {
+                "functionBody": "return [\"garage-door-opener\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "lockDuration": {
+              "title": "Длительность блокировки (секунды)",
+              "type": "number",
+              "minimum": 0,
+              "condition": {
+                "functionBody": "return [\"lock\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "unlockDuration": {
+              "title": "Длительность разблокировки (секунды)",
+              "type": "number",
+              "minimum": 0,
+              "condition": {
+                "functionBody": "return [\"lock\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "autoLockDelay": {
+              "title": "Задержка автоматической блокировки (секунды)",
+              "type": "number",
+              "minimum": 0,
+              "condition": {
+                "functionBody": "return [\"lock\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "pingIPAddress": {
+              "title": "IP-адрес для проверки доступности",
+              "type": "string",
+              "condition": {
+                "functionBody": "return [\"tv\",\"switch\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "pingFrequency": {
+              "title": "Частота проверки доступности (секунды)",
+              "type": "number",
+              "minimum": 1,
+              "condition": {
+                "functionBody": "return [\"tv\",\"switch\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "pingGrace": {
+              "title": "Период ожидания после команды (секунды)",
+              "type": "number",
+              "minimum": 0,
+              "condition": {
+                "functionBody": "return [\"tv\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "pingIPAddressStateOnly": {
+              "title": "Использовать ping только для отображения состояния",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"tv\",\"switch\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "pingUseArp": {
+              "title": "Проверять доступность через ARP",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"tv\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "mqttURL": {
+              "title": "Адрес MQTT-брокера",
+              "type": "string",
+              "condition": {
+                "functionBody": "return [\"temperatureSensor\",\"humiditySensor\",\"air-conditioner\",\"humidifier-dehumidifier\",\"heater-cooler\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "mqttUsername": {
+              "title": "Имя пользователя MQTT",
+              "type": "string",
+              "condition": {
+                "functionBody": "return [\"temperatureSensor\",\"humiditySensor\",\"air-conditioner\",\"humidifier-dehumidifier\",\"heater-cooler\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "mqttPassword": {
+              "title": "Пароль MQTT",
+              "type": "string",
+              "condition": {
+                "functionBody": "return [\"temperatureSensor\",\"humiditySensor\",\"air-conditioner\",\"humidifier-dehumidifier\",\"heater-cooler\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "mqttTopic": {
+              "title": "Топики MQTT",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "identifier": {
+                    "title": "Идентификатор значения",
+                    "type": "string",
+                    "required": true
+                  },
+                  "topic": {
+                    "title": "Топик",
+                    "type": "string",
+                    "required": true
+                  }
+                }
+              },
+              "condition": {
+                "functionBody": "return [\"temperatureSensor\",\"humiditySensor\",\"air-conditioner\",\"humidifier-dehumidifier\",\"heater-cooler\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "temperatureAdjustment": {
+              "title": "Коррекция температуры",
+              "type": "number",
+              "condition": {
+                "functionBody": "return [\"air-conditioner\",\"heater-cooler\",\"temperatureSensor\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "humidityAdjustment": {
+              "title": "Коррекция влажности",
+              "type": "number",
+              "condition": {
+                "functionBody": "return [\"air-conditioner\",\"humidifier-dehumidifier\",\"heater-cooler\",\"humiditySensor\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "temperatureUpdateFrequency": {
+              "title": "Частота обновления температуры (секунды)",
+              "type": "number",
+              "minimum": 1,
+              "condition": {
+                "functionBody": "return [\"air-conditioner\",\"heater-cooler\",\"temperatureSensor\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "humidityUpdateFrequency": {
+              "title": "Частота обновления влажности (секунды)",
+              "type": "number",
+              "minimum": 1,
+              "condition": {
+                "functionBody": "return [\"humidifier-dehumidifier\",\"humiditySensor\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "noHumidity": {
+              "title": "Не использовать влажность",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"air-conditioner\",\"humidifier-dehumidifier\",\"heater-cooler\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "minTemperature": {
+              "title": "Минимальная температура",
+              "type": "number",
+              "condition": {
+                "functionBody": "return [\"air-conditioner\",\"heater-cooler\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "maxTemperature": {
+              "title": "Максимальная температура",
+              "type": "number",
+              "condition": {
+                "functionBody": "return [\"air-conditioner\",\"heater-cooler\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "tempStepSize": {
+              "title": "Шаг температуры",
+              "type": "number",
+              "minimum": 0.1,
+              "condition": {
+                "functionBody": "return [\"air-conditioner\",\"heater-cooler\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "units": {
+              "title": "Единицы температуры (c/f)",
+              "type": "string",
+              "oneOf": [
+                {
+                  "title": "Цельсий",
+                  "enum": [
+                    "c"
+                  ]
+                },
+                {
+                  "title": "Фаренгейт",
+                  "enum": [
+                    "f"
+                  ]
+                }
+              ],
+              "condition": {
+                "functionBody": "return [\"air-conditioner\",\"heater-cooler\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "heatOnly": {
+              "title": "Только нагрев",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"air-conditioner\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "coolOnly": {
+              "title": "Только охлаждение",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"air-conditioner\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "defaultCoolTemperature": {
+              "title": "Температура охлаждения по умолчанию",
+              "type": "number",
+              "condition": {
+                "functionBody": "return [\"air-conditioner\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "defaultHeatTemperature": {
+              "title": "Температура нагрева по умолчанию",
+              "type": "number",
+              "condition": {
+                "functionBody": "return [\"air-conditioner\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "heatTemperature": {
+              "title": "Порог автоматического выбора нагрева",
+              "type": "number",
+              "condition": {
+                "functionBody": "return [\"air-conditioner\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "autoSwitch": {
+              "title": "Имя связанного выключателя автоматического режима",
+              "type": "string",
+              "condition": {
+                "functionBody": "return [\"air-conditioner\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "minimumAutoOnOffDuration": {
+              "title": "Минимальная длительность автоматического включения/выключения (секунды)",
+              "type": "number",
+              "minimum": 0,
+              "condition": {
+                "functionBody": "return [\"air-conditioner\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "turnOnWhenOff": {
+              "title": "Включать кондиционер при изменении температуры в выключенном состоянии",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"air-conditioner\",\"heater-cooler\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "replaceAutoMode": {
+              "title": "Режим вместо Auto",
+              "type": "string",
+              "description": "Значение режима, используемое вместо Auto; по умолчанию cool.",
+              "condition": {
+                "functionBody": "return model.accessories?.[arrayIndices]?.type === 'air-conditioner';"
+              }
+            },
+            "pseudoDeviceTemperature": {
+              "title": "Фиктивная температура",
+              "type": "number",
+              "condition": {
+                "functionBody": "return [\"air-conditioner\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "humidifierOnly": {
+              "title": "Только увлажнитель",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "deHumidifierOnly": {
+              "title": "Только осушитель",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "threshold": {
+              "title": "Порог влажности",
+              "type": "number",
+              "condition": {
+                "functionBody": "return [\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "humidityFilePath": {
+              "title": "Путь к файлу влажности",
+              "type": "string",
+              "condition": {
+                "functionBody": "return [\"humidifier-dehumidifier\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "batteryAlerts": {
+              "title": "Уведомления о батарее датчика",
+              "type": "boolean",
+              "condition": {
+                "functionBody": "return [\"temperatureSensor\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "w1Device": {
+              "title": "Путь/идентификатор датчика 1-Wire",
+              "type": "string",
+              "condition": {
+                "functionBody": "return [\"temperatureSensor\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "defaultMode": {
+              "title": "Режим по умолчанию",
+              "type": "string",
+              "oneOf": [
+                {
+                  "title": "Охлаждение",
+                  "enum": [
+                    "cool"
+                  ]
+                },
+                {
+                  "title": "Нагрев",
+                  "enum": [
+                    "heat"
+                  ]
+                }
+              ],
+              "condition": {
+                "functionBody": "return [\"heater-cooler\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "defaultNowTemperature": {
+              "title": "Начальная текущая температура",
+              "type": "number",
+              "condition": {
+                "functionBody": "return [\"heater-cooler\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "coolingThresholdTemperature": {
+              "title": "Порог охлаждения",
+              "type": "number",
+              "condition": {
+                "functionBody": "return [\"heater-cooler\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "heatingThresholdTemperature": {
+              "title": "Порог нагрева",
+              "type": "number",
+              "condition": {
+                "functionBody": "return [\"heater-cooler\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "defaultRotationSpeed": {
+              "title": "Скорость вращения по умолчанию (%)",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "condition": {
+                "functionBody": "return [\"heater-cooler\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "fanStepSize": {
+              "title": "Шаг скорости вентилятора",
+              "type": "number",
+              "minimum": 1,
+              "condition": {
+                "functionBody": "return [\"heater-cooler\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "temperatureUnits": {
+              "title": "Единицы температуры (C/F)",
+              "type": "string",
+              "oneOf": [
+                {
+                  "title": "Цельсий",
+                  "enum": [
+                    "C"
+                  ]
+                },
+                {
+                  "title": "Фаренгейт",
+                  "enum": [
+                    "F"
+                  ]
+                }
+              ],
+              "condition": {
+                "functionBody": "return [\"heater-cooler\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "additionalProperties": true,
+            "autoCoolTemperature": {
+              "title": "Порог автоматического охлаждения",
+              "type": "number",
+              "condition": {
+                "functionBody": "return [\"air-conditioner\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "autoHeatTemperature": {
+              "title": "Порог автоматического нагрева",
+              "type": "number",
+              "condition": {
+                "functionBody": "return [\"air-conditioner\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "autoMinimumDuration": {
+              "title": "Минимальная длительность автоматического режима (секунды)",
+              "type": "number",
+              "minimum": 0,
+              "description": "Устаревшее имя параметра; используется для совместимости с прежними конфигурациями.",
+              "condition": {
+                "functionBody": "return [\"air-conditioner\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "sendOnWhenOff": {
+              "title": "Отправлять команду включения при настройке температуры в выключенном состоянии",
+              "type": "boolean",
+              "description": "Устаревший параметр; современное имя — turnOnWhenOff.",
+              "condition": {
+                "functionBody": "return [\"air-conditioner\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "autoSwitchName": {
+              "title": "Имя связанного переключателя автоматического режима",
+              "type": "string",
+              "description": "Совместимый альтернативный ключ к autoSwitch.",
+              "condition": {
+                "functionBody": "return [\"air-conditioner\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
+            },
+            "lockUnlockDuration": {
+              "title": "Общая длительность блокировки и разблокировки (секунды)",
+              "type": "number",
+              "minimum": 0,
+              "description": "Совместимый общий параметр; отдельные lockDuration и unlockDuration имеют приоритет.",
+              "condition": {
+                "functionBody": "return [\"lock\"].includes(model.accessories?.[arrayIndices]?.type);"
+              }
             }
           }
         }

@@ -7,6 +7,7 @@ const checkForUpdates = require('./helpers/checkForUpdates');
 const broadlink = require('./helpers/broadlink');
 const { discoverDevices } = require('./helpers/getDevice');
 const { createAccessory } = require('./helpers/accessoryCreator');
+const { filterConfiguredAccessories, filterConfiguredHosts } = require('./helpers/filterConfiguration');
 
 const classTypes = {
   'air-conditioner': Accessory.AirCon,
@@ -50,10 +51,11 @@ const BroadlinkRMPlatform = class extends HomebridgePlatform {
       setTimeout(() => checkForUpdates(log), 1800);
     }
 
-    if (!config.accessories) {config.accessories = []}
+    if (config.accessories === undefined) {config.accessories = [];}
+    const configuredAccessories = filterConfiguredAccessories(config.accessories, log, logLevel);
 
     // Add a Learn Code accessory if none exist in the config
-    const learnIRAccessories = (config && config.accessories && Array.isArray(config.accessories)) ? config.accessories.filter((accessory) => (accessory.type === 'learn-ir' || accessory.type === 'learn-code')) : [];
+    const learnIRAccessories = configuredAccessories.filter((accessory) => (accessory.type === 'learn-ir' || accessory.type === 'learn-code'));
 
     if (learnIRAccessories.length === 0) {
 
@@ -70,7 +72,7 @@ const BroadlinkRMPlatform = class extends HomebridgePlatform {
 
     // Iterate through the config accessories
     const tvs = [];
-    config.accessories.forEach((accessory) => {
+    configuredAccessories.forEach((accessory) => {
       if (!accessory.type) {throw new Error(`Each accessory must be configured with a "type". e.g. "switch"`);}
       if (accessory.disabled) {return;}
       if (!classTypes[accessory.type]) {throw new Error(`homebridge-broadlink-rm-valve doesn't support accessories of type "${accessory.type}".`);}
@@ -116,7 +118,9 @@ const BroadlinkRMPlatform = class extends HomebridgePlatform {
       return;
     }
 
-    if (!hosts || (Array.isArray(hosts) && hosts.length === 0)) {
+    const configuredHosts = filterConfiguredHosts(hosts, log, logLevel);
+
+    if (configuredHosts.length === 0) {
       if (logLevel <=2) {log(`\x1b[35m[INFO]\x1b[0m Automatically discovering Broadlink RM devices.`)}
       discoverDevices(true, log, logLevel, config.deviceDiscoveryTimeout);
 
@@ -125,13 +129,9 @@ const BroadlinkRMPlatform = class extends HomebridgePlatform {
 
     discoverDevices(false, log, logLevel);
 
-    if (logLevel <=2) {log(`\x1b[35m[INFO]\x1b[0m Automatic Broadlink RM device discovery has been disabled as the "hosts" option has been set.`)}
+    if (logLevel <=2) {log(`\x1b[35m[INFO]\x1b[0m Automatic Broadlink RM device discovery has been disabled because configured hosts were supplied.`)}
 
-    assert.isArray(hosts, `\x1b[31m[CONFIG ERROR] \x1b[33mhosts\x1b[0m should be an array of objects.`)
-
-    hosts.forEach((host) => {
-      assert.isObject(host, `\x1b[31m[CONFIG ERROR] \x1b[0m Each item in the \x1b[33mhosts\x1b[0m array should be an object.`)
-
+    configuredHosts.forEach((host) => {
       const { address, isRFSupported, isRM4, mac } = host;
       assert(address, `\x1b[31m[CONFIG ERROR] \x1b[0m Each object in the \x1b[33mhosts\x1b[0m option should contain a value for \x1b[33maddress\x1b[0m (e.g. "192.168.1.23").`)
       assert(mac, `\x1b[31m[CONFIG ERROR] \x1b[0m Each object in the \x1b[33mhosts\x1b[0m option should contain a unique value for \x1b[33mmac\x1b[0m (e.g. "34:ea:34:e7:d7:28").`)

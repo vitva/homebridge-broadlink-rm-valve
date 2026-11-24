@@ -32,7 +32,7 @@ For a valve, choose **Кран (Valve)** and enter two separate learned commands
 - **Открыть (HEX)** — command that opens the valve
 - **Закрыть (HEX)** — command that closes the valve
 
-The built-in form exposes common settings and the valve fields. Advanced accessory types and multi-step command sequences remain available in Homebridge's JSON Config editor so existing configurations are not restricted by the simplified form.
+The built-in form includes the full accessory type selector and type-specific settings for the original HomeKit accessories, plus the additional **Valve** type. Settings include automatic on/off behavior, fan speeds and swing mode, light brightness and color commands, TV remote keys and inputs, temperature/humidity options, and accessory-specific timing controls. Dynamic command maps (for example, arbitrary AC temperature-code keys), nested custom sequences, and repeat/pause arrays remain supported in their original format through Homebridge's JSON Config editor.
 
 ## Water valve configuration
 
