@@ -62,7 +62,9 @@ global.Service = { Valve: function Valve () {} };
 global.Characteristic = {
   ValveType: { name: 'ValveType' },
   Active: { name: 'Active', ACTIVE: 1, INACTIVE: 0 },
-  InUse: { name: 'InUse', IN_USE: 1, NOT_IN_USE: 0 }
+  InUse: { name: 'InUse', IN_USE: 1, NOT_IN_USE: 0 },
+  SetDuration: { name: 'SetDuration' },
+  RemainingDuration: { name: 'RemainingDuration' }
 };
 
 const Valve = require('../accessories/valve');
@@ -78,11 +80,15 @@ const setActive = function (valve, value) {
 (async function () {
   const valve = createValve();
   assert.strictEqual(valve.serviceManager.values.ValveType, 3, 'default ValveType should be water faucet');
+  assert.strictEqual(valve.serviceManager.values.SetDuration, 0, 'timer should be disabled by default');
+  assert.strictEqual(valve.serviceManager.values.RemainingDuration, 0, 'remaining duration should start at zero');
 
   await setActive(valve, global.Characteristic.Active.ACTIVE);
   assert.deepStrictEqual(sentCommands, ['OPEN_COMMAND']);
   assert.strictEqual(valve.state.active, global.Characteristic.Active.ACTIVE);
   assert.strictEqual(valve.state.inUse, global.Characteristic.InUse.IN_USE);
+  assert.strictEqual(valve.serviceManager.values.Active, global.Characteristic.Active.ACTIVE, 'HomeKit Active should be explicitly updated');
+  assert.strictEqual(valve.serviceManager.values.InUse, global.Characteristic.InUse.IN_USE, 'HomeKit InUse should be explicitly updated');
 
   await setActive(valve, global.Characteristic.Active.INACTIVE);
   assert.deepStrictEqual(sentCommands, ['OPEN_COMMAND', 'CLOSE_COMMAND']);
@@ -110,6 +116,8 @@ const setActive = function (valve, value) {
   console.log('PASS: default HomeKit ValveType is water faucet (3)');
   console.log('PASS: opening sends only the configured open command');
   console.log('PASS: closing sends only the configured close command');
+  console.log('PASS: HomeKit Active and InUse are explicitly synchronized');
+  console.log('PASS: optional timer characteristics start disabled');
   console.log('PASS: failed transmission leaves the virtual state unchanged');
   console.log('PASS: incomplete valve configuration is rejected');
   console.log('PASS: missing Broadlink device leaves the virtual state unchanged');
