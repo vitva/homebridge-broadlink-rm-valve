@@ -47,7 +47,7 @@ const BroadlinkRMPlatform = class extends HomebridgePlatform {
 
     if (config.accessories === undefined) {config.accessories = [];}
     const configuredAccessories = filterConfiguredAccessories(config.accessories, log, logLevel);
-    const activeAccessories = configuredAccessories.filter((accessory) => accessory.type && !accessory.disabled);
+    const activeAccessories = configuredAccessories.filter((accessory) => accessory.type && classTypes[accessory.type] && !accessory.disabled);
 
     // Verified by Homebridge requires the plugin to remain idle until configured.
     // Do not discover devices or publish the built-in learning accessories for an empty config.
