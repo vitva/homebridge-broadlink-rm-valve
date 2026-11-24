@@ -123,14 +123,14 @@ describe('asynchronous HomeKit setters', () => {
         off: 'OFF',
         inputs: [{ name: 'HDMI', data: 'HDMI' }]
       }
-    }, 'ServiceManager');
+    }, 'FakeServiceManager');
     let resolveSend;
     let callbackCalled = false;
     tv.performSend = () => new Promise(resolve => { resolveSend = resolve; });
 
     const input = tv.serviceManager.getCharacteristic(Characteristic.ActiveIdentifier);
     const callbackPromise = new Promise(resolve => {
-      input.setValue(0, error => {
+      input.setMethod(0, error => {
         callbackCalled = true;
         resolve(error || null);
       });
@@ -156,16 +156,15 @@ describe('asynchronous HomeKit setters', () => {
         off: 'OFF',
         inputs: [{ name: 'HDMI', data: 'HDMI' }]
       }
-    }, 'ServiceManager');
+    }, 'FakeServiceManager');
     const failure = new Error('simulated TV command failure');
     tv.state.input = 2;
     tv.performSend = async () => { throw failure; };
 
     const input = tv.serviceManager.getCharacteristic(Characteristic.ActiveIdentifier);
-    const result = await new Promise(resolve => input.setValue(0, resolve));
+    const result = await new Promise(resolve => input.setMethod(0, resolve));
 
-    expect(result).to.not.equal(null);
-    expect(result).to.not.equal(undefined);
+    expect(result).to.equal(failure);
     expect(tv.state.input).to.equal(2);
   });
 
