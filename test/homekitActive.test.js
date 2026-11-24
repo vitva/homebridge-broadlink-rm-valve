@@ -1,7 +1,8 @@
 const { expect } = require('chai');
 
 const { log, setup } = require('./helpers/setup');
-const { Fan, Fanv1, TV } = require('../accessories');
+const delayForDuration = require('../helpers/delayForDuration');
+const { AirPurifier, Fan, Fanv1, TV } = require('../accessories');
 
 const baseConfig = {
   name: 'HomeKit Active compatibility test',
@@ -14,6 +15,33 @@ const baseConfig = {
 };
 
 describe('HomeKit Active characteristic value compatibility', () => {
+  it('keeps Air Purifier state in sync with numeric Active values', async () => {
+    const { device } = setup();
+    const purifier = new AirPurifier(log, {
+      ...baseConfig,
+      host: device.host.address,
+      data: {
+        ...baseConfig.data,
+        targetStateManual: 'MANUAL',
+        targetStateAuto: 'AUTO',
+        lockControls: 'LOCK',
+        unlockControls: 'UNLOCK',
+        swingToggle: 'SWING',
+        fanSpeed20: 'SPEED20'
+      }
+    }, 'ServiceManager');
+
+    const active = purifier.serviceManager.getCharacteristic(Characteristic.Active);
+    purifier.serviceManager.setCharacteristic(Characteristic.Active, Characteristic.Active.ACTIVE);
+    await delayForDuration(0.05);
+    expect(active.value).to.equal(Characteristic.Active.ACTIVE);
+    expect(purifier.state.currentState).to.equal(Characteristic.CurrentAirPurifierState.PURIFYING_AIR);
+
+    purifier.serviceManager.setCharacteristic(Characteristic.Active, Characteristic.Active.INACTIVE);
+    await delayForDuration(0.05);
+    expect(purifier.state.currentState).to.equal(Characteristic.CurrentAirPurifierState.INACTIVE);
+  });
+
   it('uses numeric Active values for Fan v2', () => {
     const { device } = setup();
     const fan = new Fan(log, {
