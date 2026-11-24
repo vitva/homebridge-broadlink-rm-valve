@@ -134,54 +134,6 @@
               "required": true,
               "oneOf": [
                 {
-                  "title": "Выключатель",
-                  "enum": [
-                    "switch"
-                  ]
-                },
-                {
-                  "title": "Мультивыключатель",
-                  "enum": [
-                    "switch-multi"
-                  ]
-                },
-                {
-                  "title": "Выключатель с повтором",
-                  "enum": [
-                    "switch-repeat"
-                  ]
-                },
-                {
-                  "title": "Мультивыключатель с повтором",
-                  "enum": [
-                    "switch-multi-repeat"
-                  ]
-                },
-                {
-                  "title": "Розетка",
-                  "enum": [
-                    "outlet"
-                  ]
-                },
-                {
-                  "title": "Свет",
-                  "enum": [
-                    "light"
-                  ]
-                },
-                {
-                  "title": "Вентилятор",
-                  "enum": [
-                    "fan"
-                  ]
-                },
-                {
-                  "title": "Вентилятор (старый)",
-                  "enum": [
-                    "fanv1"
-                  ]
-                },
-                {
                   "title": "Кондиционер",
                   "enum": [
                     "air-conditioner"
@@ -200,15 +152,21 @@
                   ]
                 },
                 {
-                  "title": "Датчик температуры",
+                  "title": "Обучение ИК-командам",
                   "enum": [
-                    "temperatureSensor"
+                    "learn-ir"
                   ]
                 },
                 {
-                  "title": "Датчик влажности",
+                  "title": "Обучение коду",
                   "enum": [
-                    "humiditySensor"
+                    "learn-code"
+                  ]
+                },
+                {
+                  "title": "Выключатель",
+                  "enum": [
+                    "switch"
                   ]
                 },
                 {
@@ -221,6 +179,48 @@
                   "title": "Замок",
                   "enum": [
                     "lock"
+                  ]
+                },
+                {
+                  "title": "Мультивыключатель",
+                  "enum": [
+                    "switch-multi"
+                  ]
+                },
+                {
+                  "title": "Мультивыключатель с повтором",
+                  "enum": [
+                    "switch-multi-repeat"
+                  ]
+                },
+                {
+                  "title": "Выключатель с повтором",
+                  "enum": [
+                    "switch-repeat"
+                  ]
+                },
+                {
+                  "title": "Вентилятор",
+                  "enum": [
+                    "fan"
+                  ]
+                },
+                {
+                  "title": "Вентилятор (старый)",
+                  "enum": [
+                    "fanv1"
+                  ]
+                },
+                {
+                  "title": "Розетка",
+                  "enum": [
+                    "outlet"
+                  ]
+                },
+                {
+                  "title": "Свет",
+                  "enum": [
+                    "light"
                   ]
                 },
                 {
@@ -242,21 +242,21 @@
                   ]
                 },
                 {
+                  "title": "Датчик температуры",
+                  "enum": [
+                    "temperatureSensor"
+                  ]
+                },
+                {
+                  "title": "Датчик влажности",
+                  "enum": [
+                    "humiditySensor"
+                  ]
+                },
+                {
                   "title": "Обогреватель/охладитель",
                   "enum": [
                     "heater-cooler"
-                  ]
-                },
-                {
-                  "title": "Обучение ИК-командам",
-                  "enum": [
-                    "learn-ir"
-                  ]
-                },
-                {
-                  "title": "Обучение коду",
-                  "enum": [
-                    "learn-code"
                   ]
                 },
                 {
