@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Await humidifier state transitions and Broadlink power commands, and log asynchronous fan timer errors.
 - Sanitize user-controlled humidifier history filenames so path separators cannot escape the Homebridge storage directory.
 - Wait for HomeKit setter actions and Broadlink sends to finish before acknowledging writes; return command failures through the HomeKit callback.
+- Restore the previous accessory state when a HomeKit command fails, avoiding a stale optimistic state.
 - Catch temperature monitor failures and await retry chains instead of leaving rejected promises unhandled.
 - Catch Broadlink discovery, device registration, and synchronous update-check errors in their asynchronous callbacks.
 - Catch failures while requesting IR/RF learning data and stop the learning session cleanly instead of throwing from timer or device-event callbacks.
