@@ -35,6 +35,16 @@ describe('accessory configuration validation', () => {
     expect(accessories).to.have.length(2);
   });
 
+  it('logs malformed accessories configuration instead of rejecting platform startup', async () => {
+    const { getAccessories } = require('./helpers/setup');
+    const accessories = await getAccessories({
+      isUnitTest: true,
+      accessories: 'not-an-array'
+    });
+
+    expect(accessories).to.have.length(0);
+  });
+
   it('safely ignores null values and accepts native JSON values', () => {
     expect(() => accessory.checkConfig({
       optional: null,
