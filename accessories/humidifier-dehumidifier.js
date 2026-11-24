@@ -7,6 +7,7 @@ const delayForDuration = require('../helpers/delayForDuration');
 const ServiceManagerTypes = require('../helpers/serviceManagerTypes');
 const catchDelayCancelError = require('../helpers/catchDelayCancelError');
 const { getDevice } = require('../helpers/getDevice');
+const safeFilename = require('../helpers/safeFilename');
 const BroadlinkRMAccessory = require('./accessory');
 
 const FanAccessory = require('./fan');
@@ -20,7 +21,7 @@ class HumidifierDehumidifierAccessory extends FanAccessory {
 	  if(config.noHistory !== true) {
       this.displayName = config.name;
       this.lastUpdatedAt = undefined;
-      this.historyService = new HistoryService("room", this, { storage: 'fs', filename: 'RMPro_' + config.name.replace(' ','-') + '_persist.json'}); 
+      this.historyService = new HistoryService('room', this, { storage: 'fs', filename: `RMPro_${safeFilename(config.name)}_persist.json` }); 
       this.historyService.log = log;
     }
     
