@@ -96,13 +96,13 @@ class FanAccessory extends BroadlinkRMAccessory {
 
     if (config.pingIPAddressStateOnly) {
       state.switchState = active ? true : false;
-      serviceManager.updateCharacteristic(Characteristic.Active,state.switchState);
+      serviceManager.updateCharacteristic(this.getPowerCharacteristic(), state.switchState);
 
       return;
     }
 
     const value = active ? true : false;
-    serviceManager.setCharacteristic(Characteristic.Active, value);
+    serviceManager.setCharacteristic(this.getPowerCharacteristic(), value);
   }
 
   async checkPingGrace () {
