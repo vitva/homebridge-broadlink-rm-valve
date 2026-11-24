@@ -26,6 +26,11 @@ describe('air purifier HomeKit characteristics', () => {
     const currentState = purifier.serviceManager.getCharacteristic(Characteristic.CurrentAirPurifierState);
     expect(currentState.getMethod).to.be.a('function');
     expect(currentState.setMethod).to.equal(undefined);
+
+    purifier.state.currentState = Characteristic.CurrentAirPurifierState.PURIFYING_AIR;
+    return currentState.getValue().then((value) => {
+      expect(value).to.equal(Characteristic.CurrentAirPurifierState.PURIFYING_AIR);
+    });
   });
 
   it('updates current state after the power command completes', async () => {
