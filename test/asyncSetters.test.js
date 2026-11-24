@@ -59,6 +59,29 @@ describe('asynchronous HomeKit setters', () => {
     expect(accessory.state.switchState).to.equal(false);
   });
 
+  it('restores the previous humidifier state when a Broadlink mode command fails', async () => {
+    const accessory = Object.create(HumidifierDehumidifierAccessory.prototype);
+    const previousState = Characteristic.CurrentHumidifierDehumidifierState.IDLE;
+    const requestedState = Characteristic.CurrentHumidifierDehumidifierState.DEHUMIDIFYING;
+    const failure = new Error('simulated humidifier mode send failure');
+    accessory.log = () => {};
+    accessory.logLevel = 2;
+    accessory.name = 'Async humidifier test';
+    accessory.state = { currentState: requestedState, switchState: true };
+    accessory.serviceManager = { updateCharacteristic: () => {} };
+    accessory.performSend = async () => { throw failure; };
+
+    let result;
+    try {
+      await accessory.setCurrentState('DEHUMIDIFY', previousState);
+    } catch (error) {
+      result = error;
+    }
+
+    expect(result).to.equal(failure);
+    expect(accessory.state.currentState).to.equal(previousState);
+  });
+
   it('waits for dehumidifier state transitions before completing the HomeKit setter action', async () => {
     const accessory = Object.create(HumidifierDehumidifierAccessory.prototype);
     accessory.config = { preventResendHex: false };
