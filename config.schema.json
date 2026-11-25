@@ -10,8 +10,7 @@
       "name": {
         "title": "Название платформы",
         "type": "string",
-        "default": "Broadlink RM",
-        "required": true
+        "default": "Broadlink RM"
       },
       "logLevel": {
         "title": "Уровень журнала",
@@ -93,13 +92,11 @@
             "address": {
               "title": "IP-адрес",
               "type": "string",
-              "required": true,
               "placeholder": "192.168.1.20"
             },
             "mac": {
               "title": "MAC-адрес",
               "type": "string",
-              "required": true,
               "placeholder": "34:ea:34:12:34:56"
             },
             "isRM4": {
@@ -112,7 +109,11 @@
               "type": "boolean",
               "default": false
             }
-          }
+          },
+          "required": [
+            "address",
+            "mac"
+          ]
         }
       },
       "accessories": {
@@ -124,13 +125,11 @@
           "properties": {
             "name": {
               "title": "Имя аксессуара",
-              "type": "string",
-              "required": true
+              "type": "string"
             },
             "type": {
               "title": "Тип аксессуара",
               "type": "string",
-              "required": true,
               "oneOf": [
                 {
                   "title": "Кондиционер",
@@ -680,8 +679,7 @@
                     "properties": {
                       "name": {
                         "title": "Название входа",
-                        "type": "string",
-                        "required": true
+                        "type": "string"
                       },
                       "type": {
                         "title": "Тип входа",
@@ -703,10 +701,13 @@
                       },
                       "data": {
                         "title": "Команда выбора (HEX)",
-                        "type": "string",
-                        "required": true
+                        "type": "string"
                       }
-                    }
+                    },
+                    "required": [
+                      "name",
+                      "data"
+                    ]
                   },
                   "condition": {
                     "functionBody": "return model.accessories?.[arrayIndices]?.type === 'tv';"
@@ -1183,15 +1184,17 @@
                 "properties": {
                   "identifier": {
                     "title": "Идентификатор значения",
-                    "type": "string",
-                    "required": true
+                    "type": "string"
                   },
                   "topic": {
                     "title": "Топик",
-                    "type": "string",
-                    "required": true
+                    "type": "string"
                   }
-                }
+                },
+                "required": [
+                  "identifier",
+                  "topic"
+                ]
               },
               "condition": {
                 "functionBody": "return [\"temperatureSensor\",\"humiditySensor\",\"air-conditioner\",\"humidifier-dehumidifier\",\"heater-cooler\"].includes(model.accessories?.[arrayIndices]?.type);"
@@ -1529,10 +1532,17 @@
               }
             }
           },
-          "additionalProperties": true
+          "additionalProperties": true,
+          "required": [
+            "name",
+            "type"
+          ]
         },
         "title": "Аксессуары HomeKit"
       }
-    }
+    },
+    "required": [
+      "name"
+    ]
   }
 }
